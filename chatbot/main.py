@@ -1,6 +1,6 @@
-from fastapi import FastAPI
+from chatbot.Application import Application
 
-app = FastAPI()
+app = Application()
 
 @app.get("/")
 async def root():

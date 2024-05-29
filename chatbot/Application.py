@@ -6,5 +6,5 @@ from .dependencies.ResponseGenerator import ResponseGenerator
 
 class Application(FastAPI):
 
-    def __init__(self, intent_classifier: IntentClassifier, info_retriever: InformationRetriever, response_generator: ResponseGenerator, document_embedder: DocumentEmbedder):
+    def __init__(self):
         super().__init__()
