@@ -1,4 +1,7 @@
 from chatbot.Application import Application
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Application()
 
