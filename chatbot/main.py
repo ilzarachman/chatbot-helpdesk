@@ -1,19 +1,20 @@
-from chatbot.Application import Application
 from dotenv import load_dotenv
+from chatbot.Application import Application
+from chatbot.logger import configure_logging
+from fastapi import FastAPI
+from chatbot.routers import router
 
-load_dotenv()
+load_dotenv(override=True)
+configure_logging()
 
+server = FastAPI()
 app = Application()
 
-@app.get("/")
-async def root():
-    return {"message": "Connected!"}
+server.include_router(router)
 
 def main():
     """
     Runs the FastAPI application using uvicorn.
-
-    This function imports the uvicorn module and calls its `run` function to start the FastAPI application. It specifies the application module as "main" and the application object as "app". The application is hosted on all available network interfaces (0.0.0.0) and listens on port 8000. The `reload` parameter is set to True, which enables automatic reloading of the application when changes are detected.
 
     This function is typically used as the entry point for running the FastAPI application.
 
@@ -24,7 +25,7 @@ def main():
         None
     """
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
+    uvicorn.run(server, host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
     main()

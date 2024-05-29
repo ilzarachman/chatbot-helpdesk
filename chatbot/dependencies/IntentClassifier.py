@@ -14,5 +14,4 @@ class IntentClassifier():
         Returns:
             str: The intent of the message.
         """
-        # Implement your intent classifier here
         pass
