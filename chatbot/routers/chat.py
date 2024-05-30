@@ -1,11 +1,11 @@
 from typing_extensions import Annotated
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from ..Application import Application
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 @router.get("/prompt")
-async def handle_prompt(app: Application = Depends(Application.get_instance)):
+async def handle_prompt(req: Request):
     """
     Handles the "/prompt" GET request.
 

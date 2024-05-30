@@ -1,0 +1,3 @@
+model:
+  text_generator: Gemini
+  text_embedder: OpenAIEmbedder
