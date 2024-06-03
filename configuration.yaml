@@ -1,3 +1,7 @@
 model:
-  text_generator: Gemini
+  text_generator: gemini
   text_embedder: OpenAIEmbedder
+
+model_garden:
+  gemini:
+    model_path: chatbot.dependencies.language_models.Gemini

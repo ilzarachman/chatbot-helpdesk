@@ -45,8 +45,9 @@ def main(server: FastAPI):
 
 
 if __name__ == "__main__":
-    load_dotenv(override=True)
-    configure_logging()
-
+    load_dotenv(override=True) # Load environment variables from .env file
+    configure_logging() # Configure logging
+    
+    # Load the configuration from the specified YAML file.
     load_configuration_file("configuration.yaml")
     main(setup_server())

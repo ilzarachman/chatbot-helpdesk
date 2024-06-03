@@ -42,7 +42,7 @@ class Configuration:
             except yaml.YAMLError as exc:
                 print(exc)
                 
-    def get(self, key: str) -> any:
+    def _get(self, key: str) -> any:
         """
         Get the value associated with the given key from the configuration data.
 
@@ -54,5 +54,21 @@ class Configuration:
         """
         try:
             return self.data[key]
+        except KeyError:
+            raise KeyError(f"Key '{key}' not found in configuration data.")
+    
+    @classmethod
+    def get(cls, key: str) -> any:
+        """
+        Get the value associated with the given key from the configuration data.
+
+        Args:
+            key (str): The key to retrieve the value for.
+
+        Returns:
+            any: The value associated with the given key. If the key is not found, a KeyError is raised.
+        """
+        try:
+            return cls._instance._get(key)
         except KeyError:
             raise KeyError(f"Key '{key}' not found in configuration data.")

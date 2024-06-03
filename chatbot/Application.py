@@ -14,6 +14,9 @@ class Application:
         return cls._instance
     
     def __init__(self):
+        """
+        Initialize the application.
+        """
         self.intent_classifier = IntentClassifier()
         self.document_embedder = DocumentEmbedder()
         self.information_retriever = InformationRetriever()
@@ -23,4 +26,12 @@ class Application:
 
     @classmethod
     def get_instance(cls) -> "Application":
+        """
+        Get the instance of the application.
+
+        Returns:
+            Application: The instance of the application.
+        """
+        if not cls._instance:
+            cls._instance = Application()
         return cls._instance
