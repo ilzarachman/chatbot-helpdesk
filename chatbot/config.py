@@ -3,6 +3,24 @@ import yaml
 from .logger import logger
 
 class Configuration:
+    """
+    Configuration file for the chatbot helpdesk application.
+
+    This file contains the configuration data for the chatbot helpdesk application.
+    The configuration data is stored in a YAML file and is loaded into the
+    Configuration class.
+
+    The Configuration class provides a get() method that can be used to retrieve
+    the value associated with a given key.
+
+    For example, to retrieve the value of the "host" key, you would use the
+    following code:
+
+    `host = Configuration.get("host")`
+
+    If the "host" key is not found in the configuration file, a KeyError will
+    be raised.
+    """
     _instance = None
 
     @classmethod
@@ -67,8 +85,13 @@ class Configuration:
 
         Returns:
             any: The value associated with the given key. If the key is not found, a KeyError is raised.
+        
+        Raises:
+            KeyError: If the key is not found in the configuration data.
         """
         try:
             return cls._instance._get(key)
         except KeyError:
             raise KeyError(f"Key '{key}' not found in configuration data.")
+        except AttributeError:
+            raise AttributeError("Configuration instance not initialized.")

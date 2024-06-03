@@ -4,6 +4,8 @@ from chatbot.config import Configuration
 from chatbot.logger import configure_logging
 from fastapi import FastAPI
 from chatbot.routers import router
+import os
+
 
 def load_configuration_file(path: str = "configuration.yaml"):
     """
@@ -17,17 +19,22 @@ def load_configuration_file(path: str = "configuration.yaml"):
     """
     Configuration(path=path)
 
+
 def setup_server() -> FastAPI:
     """
     Sets up a FastAPI server instance with an initialized Application and included router.
+    Returns:
+        A FastAPI server instance.
 
-    :return: A FastAPI server instance.
-    :rtype: FastAPI
+    Raises:
+        None
     """
     server = FastAPI()
     server.state.application = Application()
     server.include_router(router)
+
     return server
+
 
 def main(server: FastAPI):
     """
@@ -41,13 +48,16 @@ def main(server: FastAPI):
     """
     import uvicorn
 
-    uvicorn.run(server, host="0.0.0.0", port=8000)
+    try:
+        uvicorn.run(server, host="0.0.0.0", port=os.getenv("PORT", 8000))
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":
-    load_dotenv(override=True) # Load environment variables from .env file
-    configure_logging() # Configure logging
-    
+    load_dotenv(override=True)  # Load environment variables from .env file
+    configure_logging()  # Configure logging
+
     # Load the configuration from the specified YAML file.
     load_configuration_file("configuration.yaml")
     main(setup_server())

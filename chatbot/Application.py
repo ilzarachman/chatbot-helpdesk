@@ -6,6 +6,11 @@ from .dependencies.ResponseGenerator import ResponseGenerator
 from .logger import logger
 
 class Application:
+    """
+    This class represents the main application that integrates all the components of the chatbot.
+    It provides a single point of access to the chatbot's functionality.
+    """
+
     _instance: Optional["Application"] = None
 
     def __new__(cls, *args, **kwargs):
