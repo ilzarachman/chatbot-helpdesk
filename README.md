@@ -48,7 +48,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contributing Guidelines
 
-- **Commit Messages:** Use clear and concise commit messages that follow the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+- **Commit Messages:** Use clear and concise commit messages that follow the [Conventional Commits](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13) specification.
 - **Code Style:** Adhere to the project's code style guidelines.
 - **Testing:** Write tests for any new features or bug fixes.
 
