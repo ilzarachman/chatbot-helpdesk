@@ -1,7 +1,8 @@
-model:
-  text_generator: gemini
-  text_embedder: OpenAIEmbedder
+intent_classification:
+  model: gemini
 
 model_garden:
-  gemini:
-    model_path: chatbot.dependencies.language_models.Gemini
+  - gemini:
+      model_path: chatbot.dependencies.language_models.Gemini
+  - openaiembedding:
+      model_path: chatbot.dependencies.language_models.OpenAIEmbedding
