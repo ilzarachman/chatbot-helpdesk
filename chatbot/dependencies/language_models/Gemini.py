@@ -19,7 +19,7 @@ class Gemini(TextGenerator):
 
     """
     def __init__(self, model_name: str = "gemini-1.0-pro", configuration: dict = None):
-        self.model = ChatGoogleGenerativeAI(model_name)
+        self.model = ChatGoogleGenerativeAI(model=model_name)
 
     def generate(self, text: str) -> str:
         """

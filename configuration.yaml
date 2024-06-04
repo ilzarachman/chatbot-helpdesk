@@ -1,8 +1,11 @@
 intent_classification:
   model: gemini
+  params:
+    model_name: gemini-1.0-pro
+    configuration:
+      temperature: 0
 
 model_garden:
-  - gemini:
-      model_path: chatbot.dependencies.language_models.Gemini
-  - openaiembedding:
-      model_path: chatbot.dependencies.language_models.OpenAIEmbedding
+  gemini:
+    name: Gemini
+    path: chatbot.dependencies.language_models.Gemini

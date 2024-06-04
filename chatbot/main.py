@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from chatbot.Application import Application
 from chatbot.config import Configuration
-from chatbot.logger import configure_logging
+from chatbot.logger import configure_logging, logger
 from fastapi import FastAPI
 from chatbot.routers import router
 import os
@@ -51,6 +51,7 @@ def main(server: FastAPI):
     try:
         uvicorn.run(server, host="0.0.0.0", port=os.getenv("PORT", 8000))
     except KeyboardInterrupt:
+        logger.info("Application terminated by user.")
         pass
 
 

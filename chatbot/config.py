@@ -95,3 +95,13 @@ class Configuration:
             raise KeyError(f"Key '{key}' not found in configuration data.")
         except AttributeError:
             raise AttributeError("Configuration instance not initialized.")
+    
+    @classmethod
+    def get_all(cls) -> dict:
+        """
+        Get all the key-value pairs from the configuration data.
+
+        Returns:
+            dict: A dictionary containing all the key-value pairs in the configuration data.
+        """
+        return cls._instance.data
