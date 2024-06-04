@@ -26,6 +26,11 @@ class Application:
         self.information_retriever = InformationRetriever()
         self.response_generator = ResponseGenerator()
 
+        # NOTE: Below code is just for testing purposes.
+        model = self.load_model("gemini")
+        for chunk in model.stream("Explain me about FastAPI python!"):
+            print(chunk)
+
         logger.info("Application initialized successfully!")
     
     def load_model(self, model_name: str, params: dict = {}) -> Union[TextGenerator, TextEmbedder]:
