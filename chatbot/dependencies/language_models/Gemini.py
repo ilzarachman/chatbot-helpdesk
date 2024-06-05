@@ -1,10 +1,11 @@
+from ctypes import Union
 from typing import Generator, Optional
 
 from chatbot.logger import logger
 from ..contracts.TextGenerator import TextGenerator
 import google.generativeai as genai
-from google.generativeai import GenerationConfig
-from google.generativeai.types import generation_types
+from google.generativeai import GenerationConfig 
+from google.generativeai.types import generation_types, HarmCategory, HarmBlockThreshold, answer_types
 
 
 class Gemini(TextGenerator):
@@ -25,11 +26,12 @@ class Gemini(TextGenerator):
 
     """
     def __init__(self, model_name: str = "gemini-1.0-pro"):
-        harm_categories = [
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-        ]
+        harm_categories = {
+            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+        }
         self.model = genai.GenerativeModel(model_name, safety_settings=harm_categories)
     
     def _generate(self, prompt: str, config: GenerationConfig, **kwargs) -> generation_types.GenerateContentResponse:
@@ -49,6 +51,7 @@ class Gemini(TextGenerator):
             return res
         except Exception as e:
             logger.error(e)
+            raise RuntimeError("[Generation failed] " + str(e))
 
     def generate(self, prompt: str, config: Optional[dict] = None) -> str:
         """
@@ -68,7 +71,7 @@ class Gemini(TextGenerator):
             res.resolve()
             return res.text
         except ValueError as e:
-            logger.error(e)
+            logger.warning(e)
             return self._handle_value_error(res)
 
     def stream(self, prompt: str, config: Optional[dict] = None) -> Generator[str, None, None]:
@@ -82,6 +85,8 @@ class Gemini(TextGenerator):
         Returns:
             The generated text stream.
 
+        Raises:
+            ValueError: If the response is not valid.
         """
         try:
             config = GenerationConfig() if config is None else GenerationConfig(**config)
@@ -89,19 +94,27 @@ class Gemini(TextGenerator):
             for chunk in res:
                 yield chunk.text
         except ValueError as e:
-            logger.error(e)
+            logger.warning(e)
             return self._handle_value_error(res)
     
-    def _handle_value_error(self, res: generation_types.GenerateContentResponse) -> str:
+    def _handle_value_error(self, response: generation_types.GenerateContentResponse) -> str:
         """
         Handle the ValueError exception.
 
         Args:
-            e: The ValueError exception.
+            response: The response from the Google Generative AI model.
 
         Returns:
             The error message.
 
+        Raises:
+            RuntimeError: If the response is not valid.
         """
-        # TODO: Implement handler for ValueError, this mean that generation could not be performed because of safety settings (mostly) or other issues.
-        return str(res)
+        logger.warn(response.prompt_feedback)
+        logger.warn(response.candidates[0].finish_reason)
+        
+        if response.candidates[0].finish_reason == answer_types.FinishReason.SAFETY:
+            logger.warn(response.candidates[0].safety_ratings)
+            return "Maaf, saya tidak dapat melakukan respon karena alasan keamanan."
+        
+        raise RuntimeError("[Generation failed]")
