@@ -60,13 +60,16 @@ class CustomJSONFormatter(logging.Formatter):
         # Convert the dictionary to JSON
         return json.dumps(log_dict)
 
+class InfoAndErrorFilter(logging.Filter):
+    def filter(self, record):
+        return record.levelno in [logging.INFO, logging.ERROR]
 
 def configure_logging():
 
     log_folder = "logs"
     if not os.path.exists(log_folder):
         os.makedirs(log_folder)
-
+    
     logging.config.dictConfig(
         {
             "version": 1,
@@ -83,8 +86,7 @@ def configure_logging():
             },
             "filters": {
                 "only_info_and_error": {
-                    "(record)": lambda record: record.levelname == "INFO"
-                    or record.levelno >= 40,
+                    "()": InfoAndErrorFilter
                 },
             },
             "handlers": {
@@ -117,7 +119,6 @@ def configure_logging():
                     "class": "logging.StreamHandler",
                     "stream": sys.stdout,
                     "formatter": "custom",
-                    "level": "INFO",
                     "filters": ["only_info_and_error"],
                 },
             },
