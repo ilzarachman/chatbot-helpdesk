@@ -1,4 +1,3 @@
-from ctypes import Union
 from typing import Generator, Optional
 
 from chatbot.logger import logger
@@ -76,7 +75,7 @@ class Gemini(TextGenerator):
 
     def stream(self, prompt: str, config: Optional[dict] = None) -> Generator[str, None, None]:
         """
-        Generate text stream using the LangChain Google Generative AI model.
+        Generate text stream using the Google Generative AI model.
 
         Args:
             prompt: The text to generate from.
