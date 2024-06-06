@@ -7,7 +7,7 @@ from chatbot.dependencies.contracts.TextGenerator import TextGenerator
 class ModelLoader:
     _loaded_models = {}  # Dictionary to store loaded models
 
-    def load_model(self, model_name: str, params: dict = {}) -> Union[TextGenerator, TextEmbedder]:
+    def load_model(self, model_name: str) -> Union[TextGenerator, TextEmbedder]:
         """
         Loads a model from the model garden based on the given model name.
 
@@ -29,6 +29,7 @@ class ModelLoader:
         if model_info:
             model_path: str = model_info["path"]
             class_name: str = model_info["name"]
+            params: dict = model_info.get("params", {})
             model = self._load_model(model_path, class_name, params)
             self._store_model(model_name, model)  # Store the model in the loaded_models dictionary
             return model

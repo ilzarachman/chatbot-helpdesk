@@ -14,6 +14,7 @@ class TestApplication(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        Configuration(path="configuration.yaml")
         TestApplication._app = Application(
             intent_classifier=IntentClassifier(),
             document_embedder=DocumentEmbedder(),
