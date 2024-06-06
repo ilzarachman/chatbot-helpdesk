@@ -1,5 +1,6 @@
 from typing import Generator, Optional
 
+from chatbot.dependencies.contracts.message import AssistantMessage, UserMessage
 from chatbot.logger import logger
 from ..contracts.TextGenerator import TextGenerator
 import google.generativeai as genai
@@ -117,3 +118,23 @@ class Gemini(TextGenerator):
             return "Maaf, saya tidak dapat melakukan respon karena alasan keamanan."
         
         raise RuntimeError("[Generation failed] " + str(e))
+
+class GeminiUserMessage(UserMessage):
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the object.
+
+        Returns:
+            str: The string representation of the object.
+        """
+        return f"<|user|>: <MSG>{self.message}</MSG>"
+
+class GeminiAssistantMessage(AssistantMessage):
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the object.
+
+        Returns:
+            str: The string representation of the object.
+        """
+        return f"<|assistant|>: <MSG>{self.message}</MSG>"

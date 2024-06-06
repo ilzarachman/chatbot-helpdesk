@@ -1,7 +1,8 @@
 from typing import Generator
 import unittest
 from chatbot.config import Configuration
-from chatbot.dependencies.language_models.Gemini import Gemini
+from chatbot.dependencies.contracts.message import AssistantMessage, UserMessage
+from chatbot.dependencies.language_models.Gemini import Gemini, GeminiAssistantMessage, GeminiUserMessage
 
 class TestGemini(unittest.TestCase):
     _instance = None
@@ -21,3 +22,8 @@ class TestGemini(unittest.TestCase):
         generator = self._instance.stream("This is a prompt.")
         self.assertIsInstance(generator, Generator)
     
+    def test_message_template_casts_to_str(self):
+        user_message = GeminiUserMessage("This is a prompt.")
+        assistant_message = GeminiAssistantMessage("This is an answer.")
+        self.assertIsInstance(str(user_message), str)
+        self.assertIsInstance(str(assistant_message), str)

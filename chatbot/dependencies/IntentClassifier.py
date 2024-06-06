@@ -1,7 +1,18 @@
+from typing import Optional
+from chatbot.config import Configuration
+from chatbot.dependencies.ModelLoader import ModelLoader
+from chatbot.dependencies.contracts.TextGenerator import TextGenerator
+
 
 class IntentClassifier():
     def __init__(self):
-        super().__init__()
+        self.intent_classifier_config: dict = Configuration.get("intent_classifier")
+
+    @property
+    def model(self) -> TextGenerator:
+        if not self._model:
+            self._model = ModelLoader().load_model(self.intent_classifier_config.get("model"))
+        return self._model
 
     def classify(self, message: str) -> str:
         """Classify the intent of the given message.
