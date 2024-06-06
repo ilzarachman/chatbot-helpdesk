@@ -28,8 +28,6 @@ class Application:
 
         # NOTE: Below code is just for testing purposes.
         model = self.load_model("gemini")
-        for chunk in model.stream("Explain me about FastAPI python!"):
-            print(chunk)
 
         logger.info("Application initialized successfully!")
     
