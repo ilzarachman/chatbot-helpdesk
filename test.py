@@ -21,6 +21,8 @@ if __name__ == '__main__':
 
         for folder in only_folders:
             test_suite.addTest(get_test_cases(folder))
+    else:
+        test_suite = get_test_cases("test/")
     
     if args.verbose:
         # Enable verbose output
