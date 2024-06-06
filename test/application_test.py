@@ -12,12 +12,16 @@ class TestApplication(unittest.TestCase):
     pass
     # _app = None
 
-    # @classmethod
-    # def setUpClass(cls) -> None:
-    #     _app = Application(
-    #         intent_classifier=IntentClassifier(),
-    #         document_embedder=DocumentEmbedder(),
-    #         information_retriever=InformationRetriever(),
-    #         response_generator=ResponseGenerator(),
-    #     )
+    @classmethod
+    def setUpClass(cls) -> None:
+        TestApplication._app = Application(
+            intent_classifier=IntentClassifier(),
+            document_embedder=DocumentEmbedder(),
+            information_retriever=InformationRetriever(),
+            response_generator=ResponseGenerator(),
+        )
+        return super().setUpClass()
+
+    def test_app_reinitialized_returns_the_same_instance(self):
+        self.assertEqual(TestApplication._app, Application.get_instance())
     

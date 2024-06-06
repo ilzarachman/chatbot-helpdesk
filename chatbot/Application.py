@@ -25,9 +25,6 @@ class Application:
         """
         Initialize the application.
         """
-        if Application._instance is not None:
-            raise Exception("Application instance already created (Singleton)")
-
         self.intent_classifier = intent_classifier
         self.document_embedder = document_embedder
         self.information_retriever = information_retriever
@@ -37,7 +34,7 @@ class Application:
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
-            cls._instance = super().__new__(cls, *args, **kwargs)
+            cls._instance = super().__new__(cls)
         return cls._instance
 
     @classmethod
