@@ -36,7 +36,7 @@ def setup_server() -> FastAPI:
     return server
 
 
-def main(server: FastAPI):
+def run_app(server: FastAPI):
     """
     Runs the FastAPI application using uvicorn.
 
@@ -55,10 +55,25 @@ def main(server: FastAPI):
         pass
 
 
-if __name__ == "__main__":
-    load_dotenv(override=True)  # Load environment variables from .env file
+def main():
+    """
+    Initializes the main function of the program.
+
+    This function loads environment variables from a .env file, configures logging,
+    loads the configuration from a specified YAML file, and runs the FastAPI application
+    using uvicorn.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     configure_logging()  # Configure logging
 
     # Load the configuration from the specified YAML file.
     load_configuration_file("configuration.yaml")
-    main(setup_server())
+    run_app(setup_server())
+
+if __name__ == "__main__":
+    main()
