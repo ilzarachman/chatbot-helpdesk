@@ -71,7 +71,7 @@ class Gemini(TextGenerator):
             return res.text
         except ValueError as e:
             logger.warning(e)
-            return self._handle_value_error(res)
+            return self._handle_value_error(e, res)
 
     def stream(self, prompt: str, config: Optional[dict] = None) -> Generator[str, None, None]:
         """
@@ -94,9 +94,9 @@ class Gemini(TextGenerator):
                 yield chunk.text
         except ValueError as e:
             logger.warning(e)
-            return self._handle_value_error(res)
+            return self._handle_value_error(e, res)
     
-    def _handle_value_error(self, response: generation_types.GenerateContentResponse) -> str:
+    def _handle_value_error(self, e: ValueError, response: generation_types.GenerateContentResponse) -> str:
         """
         Handle the ValueError exception.
 
@@ -116,4 +116,4 @@ class Gemini(TextGenerator):
             logger.warn(response.candidates[0].safety_ratings)
             return "Maaf, saya tidak dapat melakukan respon karena alasan keamanan."
         
-        raise RuntimeError("[Generation failed]")
+        raise RuntimeError("[Generation failed] " + str(e))
