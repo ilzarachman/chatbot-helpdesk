@@ -2,6 +2,7 @@ import yaml
 
 from .logger import logger
 
+
 class Configuration:
     """
     Configuration file for the chatbot helpdesk application.
@@ -38,7 +39,7 @@ class Configuration:
         if cls._instance is None:
             cls._instance = super(Configuration, cls).__new__(cls)
         return cls._instance
-    
+
     def __init__(self, path: str):
         """
         Initializes a new instance of the Configuration class.
@@ -56,10 +57,10 @@ class Configuration:
         with open(path, 'r') as stream:
             try:
                 self.data = yaml.safe_load(stream)
-                logger.info("Configuration loaded successfully!")    
+                logger.info("Configuration loaded successfully!")
             except yaml.YAMLError as exc:
                 print(exc)
-                
+
     def _get(self, key: str) -> any:
         """
         Get the value associated with the given key from the configuration data.
@@ -74,7 +75,7 @@ class Configuration:
             return self.data[key]
         except KeyError:
             raise KeyError(f"Key '{key}' not found in configuration data.")
-    
+
     @classmethod
     def get(cls, key: str) -> any:
         """
@@ -95,7 +96,7 @@ class Configuration:
             raise KeyError(f"Key '{key}' not found in configuration data.")
         except AttributeError:
             raise AttributeError("Configuration instance not initialized.")
-    
+
     @classmethod
     def get_all(cls) -> dict:
         """
