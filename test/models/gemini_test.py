@@ -18,14 +18,22 @@ class TestGemini(unittest.TestCase):
         return super().setUpClass()
 
     def test_generate_text(self):
-        text = self._instance.generate([UserMessage("This is a prompt.")])
+        text = self._instance.generate([
+            UserMessage("This is a prompt."),
+            AssistantMessage("This is an answer."),
+            UserMessage("This is another prompt."),
+            AssistantMessage("This is another answer."),
+            UserMessage("This is yet another prompt."),
+            AssistantMessage("This is yet another answer."),
+            UserMessage("You have reached the end of the conversation."),
+        ])
         print(text)
         self.assertIsNotNone(text)
         self.assertIsInstance(text, str)
 
-    @unittest.skip("Because of long runtime.")
     def test_streaming_text_returns_generator(self):
-        generator = self._instance.stream([Gemini.GeminiUserMessage("This is a prompt.")])
+        generator = self._instance.stream([UserMessage("This is a prompt.")])
+        print(generator)
         self.assertIsInstance(generator, Generator)
 
     def test_message_template_casts_to_str(self):

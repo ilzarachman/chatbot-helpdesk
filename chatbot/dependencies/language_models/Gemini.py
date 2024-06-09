@@ -94,15 +94,18 @@ class Gemini(TextGenerator):
             The string representation of the messages.
         """
         casted_messages = []
-        for msg in messages:
-            if isinstance(msg, UserMessage):
-                casted_messages.append(Gemini.GeminiUserMessage(msg.message))
-            elif isinstance(msg, AssistantMessage):
-                casted_messages.append(Gemini.GeminiAssistantMessage(msg.message))
-            elif isinstance(msg, SystemMessage):
-                casted_messages.append(Gemini.GeminiSystemMessage(msg.message))
+        try:
+            for msg in messages:
+                if isinstance(msg, UserMessage):
+                    casted_messages.append(Gemini.GeminiUserMessage(msg.message))
+                elif isinstance(msg, AssistantMessage):
+                    casted_messages.append(Gemini.GeminiAssistantMessage(msg.message))
+                elif isinstance(msg, SystemMessage):
+                    casted_messages.append(Gemini.GeminiSystemMessage(msg.message))
 
-        return "\n".join([str(msg) for msg in casted_messages])
+            return "\n".join([str(msg) for msg in casted_messages])
+        except Exception as e:
+            logger.error(e)
 
     def generate(self, prompt: list[Message], config: Optional[dict] = None) -> str:
         """
