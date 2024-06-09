@@ -1,12 +1,22 @@
 import os
 from typing import Generator, Optional
 
-from chatbot.dependencies.contracts.message import AssistantMessage, UserMessage, Message
+from chatbot.dependencies.contracts.message import (
+    AssistantMessage,
+    UserMessage,
+    Message,
+    SystemMessage,
+)
 from chatbot.logger import logger
 from ..contracts.TextGenerator import TextGenerator
 import google.generativeai as genai
 from google.generativeai import GenerationConfig
-from google.generativeai.types import generation_types, HarmCategory, HarmBlockThreshold, answer_types
+from google.generativeai.types import (
+    generation_types,
+    HarmCategory,
+    HarmBlockThreshold,
+    answer_types,
+)
 
 
 class Gemini(TextGenerator):
@@ -27,6 +37,18 @@ class Gemini(TextGenerator):
 
     """
 
+    class GeminiUserMessage(UserMessage):
+        def __str__(self):
+            return f"input: {self.message}"
+
+    class GeminiAssistantMessage(AssistantMessage):
+        def __str__(self):
+            return f"output: {self.message}"
+
+    class GeminiSystemMessage(SystemMessage):
+        def __str__(self):
+            return f"system: {self.message}"
+
     def __init__(self, model_name: str = "gemini-1.0-pro"):
         harm_categories = {
             HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
@@ -37,40 +59,12 @@ class Gemini(TextGenerator):
         genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
         self.model = genai.GenerativeModel(model_name, safety_settings=harm_categories)
 
-    class GeminiMessage(Message):
-        def __str__(self) -> str:
-            """
-            Returns a string representation of the object.
-
-            Returns:
-                str: The string representation of the object.
-            """
-            pass
-
-    class GeminiUserMessage(GeminiMessage):
-        def __str__(self) -> str:
-            """
-            Returns a string representation of the object.
-
-            Returns:
-                str: The string representation of the object.
-            """
-            return f"input: {self.message}"
-
-    class GeminiAssistantMessage(GeminiMessage):
-        def __str__(self) -> str:
-            """
-            Returns a string representation of the object.
-
-            Returns:
-                str: The string representation of the object.
-            """
-            return f"output: {self.message}"
-
-    def _generate(self, prompt: str, config: GenerationConfig, **kwargs) -> generation_types.GenerateContentResponse:
+    def _generate(
+        self, prompt: str, config: GenerationConfig, **kwargs
+    ) -> generation_types.GenerateContentResponse:
         """
         Generate text using the Google Generative AI model.
-        
+
         Args:
             prompt: The text to generate from.
             config: The generation config.
@@ -80,14 +74,16 @@ class Gemini(TextGenerator):
 
         """
         try:
-            res = self.model.generate_content(prompt, generation_config=config, **kwargs)
+            res = self.model.generate_content(
+                prompt, generation_config=config, **kwargs
+            )
             return res
         except Exception as e:
             logger.error(e)
             raise RuntimeError("[Generation failed] " + str(e))
 
     @staticmethod
-    def _messages_to_str(messages: list[GeminiMessage]) -> str:
+    def _gemini_messages_to_str(messages: list[Message]) -> str:
         """
         Convert a list of messages to a string.
 
@@ -97,9 +93,18 @@ class Gemini(TextGenerator):
         Returns:
             The string representation of the messages.
         """
-        return "\n".join([str(m) for m in messages])
+        casted_messages = []
+        for msg in messages:
+            if isinstance(msg, UserMessage):
+                casted_messages.append(Gemini.GeminiUserMessage(msg.message))
+            elif isinstance(msg, AssistantMessage):
+                casted_messages.append(Gemini.GeminiAssistantMessage(msg.message))
+            elif isinstance(msg, SystemMessage):
+                casted_messages.append(Gemini.GeminiSystemMessage(msg.message))
 
-    def generate(self, prompt: list[GeminiMessage], config: Optional[dict] = None) -> str:
+        return "\n".join([str(msg) for msg in casted_messages])
+
+    def generate(self, prompt: list[Message], config: Optional[dict] = None) -> str:
         """
         Generate text using the LangChain Google Generative AI model.
 
@@ -112,7 +117,7 @@ class Gemini(TextGenerator):
 
         """
         config = GenerationConfig() if config is None else GenerationConfig(**config)
-        prompt = self._messages_to_str(prompt)
+        prompt = self._gemini_messages_to_str(prompt)
         res = self._generate(prompt, config)
         try:
             res.resolve()
@@ -123,7 +128,9 @@ class Gemini(TextGenerator):
             logger.warning(e)
             return self._handle_value_error(e, res)
 
-    def stream(self, prompt: list[GeminiMessage], config: Optional[dict] = None) -> Generator[str, None, None]:
+    def stream(
+        self, prompt: list[Message], config: Optional[dict] = None
+    ) -> Generator[str, None, None]:
         """
         Generate text stream using the Google Generative AI model.
 
@@ -138,7 +145,7 @@ class Gemini(TextGenerator):
             ValueError: If the response is not valid.
         """
         config = GenerationConfig() if config is None else GenerationConfig(**config)
-        prompt = self._messages_to_str(prompt)
+        prompt = self._gemini_messages_to_str(prompt)
         res = self._generate(prompt, config, stream=True)
         try:
             for chunk in res:
@@ -148,7 +155,9 @@ class Gemini(TextGenerator):
             yield self._handle_value_error(e, res)
 
     @staticmethod
-    def _handle_value_error(e: ValueError, response: generation_types.GenerateContentResponse) -> str:
+    def _handle_value_error(
+        e: ValueError, response: generation_types.GenerateContentResponse
+    ) -> str:
         """
         Handle the ValueError exception.
 

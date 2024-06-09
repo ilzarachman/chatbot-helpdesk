@@ -12,48 +12,74 @@ class Message(ABC):
         self.message = message
 
     @abstractmethod
-    def __str__(self) -> str:
+    def get_message(self) -> dict:
         """
         Returns a string representation of the message.
 
         Returns:
-            str: The string representation of the message.
+            dict: The string representation of the message.
         """
         pass
 
 
 class AssistantMessage(Message):
-    @abstractmethod
-    def __str__(self) -> str:
+
+    def get_message(self) -> dict:
+        """
+        Returns a string representation of the message.
+
+        Returns:
+            dict: The string representation of the message.
+        """
+        return {"role": "assistant", "content": self.message}
+
+    def __str__(self):
         """
         Returns a string representation of the message.
 
         Returns:
             str: The string representation of the message.
         """
-        pass
+        return self.message
 
 
 class UserMessage(Message):
 
-    @abstractmethod
-    def __str__(self) -> str:
+    def get_message(self) -> dict:
+        """
+        Returns a string representation of the message.
+
+        Returns:
+            dict: The string representation of the message.
+        """
+        return {"role": "user", "content": self.message}
+
+    def __str__(self):
         """
         Returns a string representation of the message.
 
         Returns:
             str: The string representation of the message.
         """
-        pass
+        return self.message
 
 
 class SystemMessage(Message):
-    @abstractmethod
-    def __str__(self) -> str:
+
+    def get_message(self) -> dict:
         """
         Returns a string representation of the message.
 
         Returns:
-            str: The string representation of the message.        
+            dict: The string representation of the message.
         """
-        pass
+        return {"role": "system", "content": self.message}
+
+    def __str__(self):
+        """
+        Returns a string representation of the message.
+
+        Returns:
+            str: The string representation of the message.
+        """
+        return self.message

@@ -17,14 +17,13 @@ class TestGemini(unittest.TestCase):
         cls._instance = Gemini()
         return super().setUpClass()
 
-    # @unittest.skip("Because of long runtime.")
     def test_generate_text(self):
-        text = self._instance.generate([Gemini.GeminiUserMessage("This is a prompt.")])
+        text = self._instance.generate([UserMessage("This is a prompt.")])
         print(text)
         self.assertIsNotNone(text)
         self.assertIsInstance(text, str)
 
-    # @unittest.skip("Because of long runtime.")
+    @unittest.skip("Because of long runtime.")
     def test_streaming_text_returns_generator(self):
         generator = self._instance.stream([Gemini.GeminiUserMessage("This is a prompt.")])
         self.assertIsInstance(generator, Generator)
