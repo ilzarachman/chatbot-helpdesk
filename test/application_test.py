@@ -8,9 +8,9 @@ from chatbot.dependencies.DocumentEmbedder import DocumentEmbedder
 from chatbot.dependencies.InformationRetriever import InformationRetriever
 from chatbot.dependencies.ResponseGenerator import ResponseGenerator
 
+
 class TestApplication(unittest.TestCase):
-    pass
-    # _app = None
+    _app = None
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -25,4 +25,3 @@ class TestApplication(unittest.TestCase):
 
     def test_app_reinitialized_returns_the_same_instance(self):
         self.assertEqual(TestApplication._app, Application.get_instance())
-    

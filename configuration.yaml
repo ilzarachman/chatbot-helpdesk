@@ -9,3 +9,6 @@ model_garden:
     path: chatbot.dependencies.language_models.Gemini
     params:
       model_name: gemini-1.0-pro
+
+prompts:
+  directory: prompts/

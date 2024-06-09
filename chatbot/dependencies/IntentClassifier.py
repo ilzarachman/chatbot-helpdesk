@@ -4,15 +4,11 @@ from chatbot.dependencies.ModelLoader import ModelLoader
 from chatbot.dependencies.contracts.TextGenerator import TextGenerator
 
 
-class IntentClassifier():
+class IntentClassifier:
     def __init__(self):
-        self.intent_classifier_config: dict = Configuration.get("intent_classifier")
-
-    @property
-    def model(self) -> TextGenerator:
-        if not self._model:
-            self._model = ModelLoader().load_model(self.intent_classifier_config.get("model"))
-        return self._model
+        self._intent_classifier_config: dict = Configuration.get("intent_classifier")
+        _model_name = self._intent_classifier_config.get("model")
+        self._model: Optional[TextGenerator] = ModelLoader.load_model(_model_name)
 
     def classify(self, message: str) -> str:
         """Classify the intent of the given message.
@@ -25,4 +21,5 @@ class IntentClassifier():
         Returns:
             str: The intent of the message.
         """
+        # TODO: Add classify implementation in here
         pass
