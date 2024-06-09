@@ -12,5 +12,5 @@ class TestPromptManager(unittest.TestCase):
         return super().setUpClass()
 
     def test_get_prompt_returns_string(self):
-        prompt = PromptManager.get_prompt("intent_classification", "main_prompt")
+        prompt = PromptManager.get_prompt("intent_classification", "main_prompt", {"intent_list": "greeting,shouting"})
         self.assertIsInstance(prompt, str)

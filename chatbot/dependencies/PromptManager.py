@@ -1,6 +1,7 @@
 from typing import Optional
 
 from chatbot.config import Configuration
+from jinja2 import Template
 import yaml
 
 
@@ -32,23 +33,32 @@ class PromptManager:
             raise FileNotFoundError(f"Prompt '{prompt_name}' not found.")
 
     @classmethod
-    def get_prompt(cls, prompt_filename: str, prompt_name: str) -> str:
+    def get_prompt(cls, prompt_filename: str, prompt_name: str, context: Optional[dict] = None) -> str:
         """
-        Get a prompt message from a prompt file.
+        A method to get a prompt based on the prompt filename, prompt name, and optional context.
 
         Args:
             cls: The class reference.
-            prompt_filename (str): The name of the prompt file.
-            prompt_name (str): The specific prompt to retrieve.
+            prompt_filename (str): The filename of the prompt.
+            prompt_name (str): The name of the prompt.
+            context (Optional[dict], optional): Additional context for rendering the prompt. Defaults to None.
 
         Returns:
-            str: The retrieved prompt message.
+            str: The rendered prompt.
 
         Raises:
-            KeyError: If the prompt with the given name is not found in the file.
+            KeyError: If the prompt name is not found in the prompt file.
         """
-        prompt_file = cls._read_prompt_file(prompt_filename)
         try:
-            return prompt_file[prompt_name]
+            prompt_file = cls._read_prompt_file(prompt_filename)
+            template_string = Template(prompt_file[prompt_name])
+
+            if context:
+                return template_string.render(**context)
+            else:
+                return template_string.render()
+
         except KeyError:
             raise KeyError(f"Prompt '{prompt_name}' not found in '{prompt_filename}' file.")
+        except Exception as e:
+            raise e
