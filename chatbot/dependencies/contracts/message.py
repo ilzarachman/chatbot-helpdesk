@@ -1,8 +1,9 @@
 from abc import abstractmethod, ABC
+from typing import Optional
 
 
 class Message(ABC):
-    def __init__(self, message: str):
+    def __init__(self, message: Optional[str]):
         """
         Initializes a new instance of the class.
 
