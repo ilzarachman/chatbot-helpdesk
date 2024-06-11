@@ -3,12 +3,15 @@ from chatbot.config import Configuration
 from chatbot.dependencies.ModelLoader import ModelLoader
 from chatbot.dependencies.PromptManager import PromptManager
 from chatbot.dependencies.contracts.TextGenerator import TextGenerator
+from chatbot.dependencies.contracts.message import Message, SystemMessage, UserMessage
 from chatbot.dependencies.utils.StringEnum import StringEnum
 
 
 class Intent(StringEnum):
-    RELEVANT = "relevan"
-    NOT_RELEVANT = "tidak_relevan"
+    ACADEMIC_ADMINISTRATION = "academic_administration"
+    RESOURCE_SERVICE = "resource_service"
+    SUPPORT = "assistant_support"
+    OTHER = "other"
 
     @staticmethod
     def list() -> list[str]:
@@ -71,5 +74,9 @@ class IntentClassifier:
         Returns:
             str: The intent of the message.
         """
-        # TODO: Add classify implementation in here
-        pass
+        prompts: list[Message] = [
+            SystemMessage(self._prompt_template),
+            UserMessage(message),
+        ]
+
+        return self._model.generate(prompts)
