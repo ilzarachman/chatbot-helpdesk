@@ -33,7 +33,8 @@ class TestGemini(unittest.TestCase):
 
     def test_streaming_text_returns_generator(self):
         generator = self._instance.stream([UserMessage("This is a prompt.")])
-        print(generator)
+        for chunk in generator:
+            print(chunk)
         self.assertIsInstance(generator, Generator)
 
     def test_message_template_casts_to_str(self):

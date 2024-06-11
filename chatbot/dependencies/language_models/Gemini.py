@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Generator, Optional
 
@@ -103,6 +104,7 @@ class Gemini(TextGenerator):
                 elif isinstance(msg, SystemMessage):
                     casted_messages.append(Gemini.GeminiSystemMessage(msg.message))
 
+            casted_messages.append(Gemini.GeminiAssistantMessage(""))
             return "\n".join([str(msg) for msg in casted_messages])
         except Exception as e:
             logger.error(e)

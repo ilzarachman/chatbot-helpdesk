@@ -4,6 +4,7 @@ from chatbot.dependencies.ModelLoader import ModelLoader
 from chatbot.dependencies.contracts.TextGenerator import TextGenerator
 from chatbot.dependencies.language_models.Gemini import Gemini
 
+
 class TestModelLoader(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
