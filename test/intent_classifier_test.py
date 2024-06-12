@@ -1,5 +1,6 @@
 import unittest
 
+import pytest
 from dotenv import load_dotenv
 
 from chatbot.config import Configuration
@@ -21,6 +22,7 @@ class TestIntentClassifier(unittest.TestCase):
         list_intents = Intent.list()
         self.assertIsInstance(list_intents, list)
 
+    @pytest.mark.slow
     def test_classify_returns_intent_string(self):
         intent = self._intent_classifier.classify("apakah ada matkul biologi semester ini?")
         print(intent)

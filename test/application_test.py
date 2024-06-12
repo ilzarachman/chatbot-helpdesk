@@ -1,4 +1,7 @@
 import unittest
+
+import pytest
+
 from chatbot.Application import Application
 from chatbot.config import Configuration
 from chatbot.dependencies.contracts.TextGenerator import TextGenerator
@@ -9,7 +12,7 @@ from chatbot.dependencies.InformationRetriever import InformationRetriever
 from chatbot.dependencies.ResponseGenerator import ResponseGenerator
 
 
-@unittest.skip("Skipping test")
+@pytest.mark.integration
 class TestApplication(unittest.TestCase):
     _app = None
 

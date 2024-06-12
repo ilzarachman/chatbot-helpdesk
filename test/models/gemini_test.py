@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from chatbot.config import Configuration
 from chatbot.dependencies.contracts.message import AssistantMessage, Message, UserMessage
 from chatbot.dependencies.language_models.Gemini import Gemini
+import pytest
 
 
 class TestGemini(unittest.TestCase):
@@ -17,7 +18,8 @@ class TestGemini(unittest.TestCase):
         cls._instance = Gemini()
         return super().setUpClass()
 
-    def test_generate_text(self):
+    @pytest.mark.slow
+    def test_generate_text_integration(self):
         text = self._instance.generate([
             UserMessage("This is a prompt."),
             AssistantMessage("This is an answer."),
@@ -31,7 +33,8 @@ class TestGemini(unittest.TestCase):
         self.assertIsNotNone(text)
         self.assertIsInstance(text, str)
 
-    def test_streaming_text_returns_generator(self):
+    @pytest.mark.slow
+    def test_streaming_text_returns_generator_integration(self):
         generator = self._instance.stream([UserMessage("This is a prompt.")])
         for chunk in generator:
             print(chunk)
