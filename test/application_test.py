@@ -1,4 +1,7 @@
 import unittest
+
+import pytest
+
 from chatbot.Application import Application
 from chatbot.config import Configuration
 from chatbot.dependencies.contracts.TextGenerator import TextGenerator
@@ -8,12 +11,14 @@ from chatbot.dependencies.DocumentEmbedder import DocumentEmbedder
 from chatbot.dependencies.InformationRetriever import InformationRetriever
 from chatbot.dependencies.ResponseGenerator import ResponseGenerator
 
+
+@pytest.mark.integration
 class TestApplication(unittest.TestCase):
-    pass
-    # _app = None
+    _app = None
 
     @classmethod
     def setUpClass(cls) -> None:
+        Configuration(path="configuration.yaml")
         TestApplication._app = Application(
             intent_classifier=IntentClassifier(),
             document_embedder=DocumentEmbedder(),
@@ -24,4 +29,3 @@ class TestApplication(unittest.TestCase):
 
     def test_app_reinitialized_returns_the_same_instance(self):
         self.assertEqual(TestApplication._app, Application.get_instance())
-    
