@@ -6,14 +6,17 @@ from dotenv import load_dotenv
 from chatbot.config import Configuration
 from chatbot.dependencies.IntentClassifier import IntentClassifier, Intent
 
+load_dotenv(override=True)
+
 
 class TestIntentClassifier(unittest.TestCase):
     _intent_classifier: IntentClassifier = None
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls) -> None:
         Configuration(path="configuration.yaml")
-        load_dotenv(override=True)
-        self._intent_classifier = IntentClassifier()
+        cls._intent_classifier = IntentClassifier()
+        return super().setUpClass()
 
     def test_intent_classifier(self):
         self.assertIsInstance(self._intent_classifier, IntentClassifier)

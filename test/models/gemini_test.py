@@ -7,6 +7,8 @@ from chatbot.dependencies.contracts.message import AssistantMessage, Message, Us
 from chatbot.dependencies.language_models.Gemini import Gemini
 import pytest
 
+load_dotenv(override=True)
+
 
 class TestGemini(unittest.TestCase):
     _instance = None
@@ -14,7 +16,6 @@ class TestGemini(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         Configuration(path="configuration.yaml")
-        load_dotenv(override=True)
         cls._instance = Gemini()
         return super().setUpClass()
 
