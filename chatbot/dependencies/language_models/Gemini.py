@@ -55,7 +55,7 @@ class Gemini(TextGenerator):
 
     class GeminiResponse:
         def __init__(self, response: str):
-            self.response = re.sub(r"</msg>$", "", response)
+            self.response = re.sub(r"\n?</msg>$", "", response)
 
         def __str__(self):
             return self.response
