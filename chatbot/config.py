@@ -72,7 +72,11 @@ class Configuration:
             any: The value associated with the given key. If the key is not found, a KeyError is raised.
         """
         try:
-            return self.data[key]
+            keys = key.split('.')
+            temp_data = self.data
+            for k in keys:
+                temp_data = temp_data.get(k)
+            return temp_data
         except KeyError:
             raise KeyError(f"Key '{key}' not found in configuration data.")
 

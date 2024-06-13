@@ -19,3 +19,14 @@ class TextEmbedder(ABC):
             Any
         """
         pass
+
+    @property
+    @abstractmethod
+    def model(self):
+        """
+        Get the internal model.
+
+        Returns:
+            Any
+        """
+        pass
