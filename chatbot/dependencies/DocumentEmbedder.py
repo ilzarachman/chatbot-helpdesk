@@ -1,22 +1,40 @@
+from pathlib import Path
+
+from langchain_core.documents import Document
+
 from .IntentClassifier import Intent
 from .ModelLoader import ModelLoader
 from .contracts.TextEmbedder import TextEmbedder
+from .utils.path_utils import project_path
 from ..config import Configuration
 from langchain_community import document_loaders
+from langchain_community.document_loaders.base import BaseLoader
+from langchain_text_splitters import TextSplitter, RecursiveCharacterTextSplitter
+import importlib
 
 
 class DocumentEmbedder:
     """This class is responsible for embedding documents into vectors."""
-    _supported_document_types = {
+
+    _supported_document_types: dict[str, type(BaseLoader)] = {
         "txt": document_loaders.TextLoader,
-        "pdf": document_loaders.PDFLoader
+        "pdf": document_loaders.PyPDFLoader,
     }
+    """
+    Supported document types.
+
+    Supported document types are:
+    - txt
+    - pdf
+    """
 
     def __init__(self):
         """Initialize the DocumentEmbedder class."""
-        self._embedding_model = ModelLoader.load_model(
+        self._embedding_model: TextEmbedder = ModelLoader.load_model(
             Configuration.get("document_embedder.model")
         )
+        self._text_splitter_config = Configuration.get("document_embedder.text_splitter")
+        self._text_splitter: TextSplitter = self._get_text_splitter()
 
     def save_document_to_vectorstore(self, doc_path: str, doc_category: Intent) -> None:
         """
@@ -32,13 +50,14 @@ class DocumentEmbedder:
         Raises:
             RuntimeError: document can't be saved.
         """
-        # 1. load the document
-        raw_doc = self._load_document(doc_path)
-        # 2. split the document into chunks
-        # 3. embed the chunks
-        # 4. save the document to the vectorstorage
+        try:
+            raw_doc = self._load_document(doc_path)
+            documents = self._split_raw_document(raw_doc)
+            self._save_to_faiss_index(documents, doc_category)
+        except Exception as e:
+            raise RuntimeError(f"Error saving document to vectorstore: {e}")
 
-    def _load_document(self, doc_path: str) -> str:
+    def _load_document(self, doc_path: str) -> list[Document]:
         """
         Loads a document from a file.
 
@@ -49,10 +68,58 @@ class DocumentEmbedder:
             str: The content of the document.
 
         Raises:
-            RuntimeError: document can't be loaded.
+            RuntimeError: If the document type is not supported.
         """
         doc_type = doc_path.split(".")[-1]
         if doc_type in self._supported_document_types:
             loader = self._supported_document_types[doc_type]
-            return loader(doc_path).load()
-        raise RuntimeError("document can't be loaded.")
+            try:
+                _loader = loader(doc_path)
+                return _loader.load()
+            except Exception as e:
+                raise RuntimeError(f"Error loading document: {e}")
+        else:
+            raise RuntimeError("Document type not supported.")
+
+    def _get_text_splitter(self) -> TextSplitter:
+        """
+        Dynamically loads the text splitter based on the configuration.
+
+        Returns:
+            TextSplitter: The text splitter.
+        """
+        text_splitter_type = self._text_splitter_config.get("type")
+        module = importlib.import_module(
+            f"langchain_text_splitters"
+        )
+        params = self._text_splitter_config.get("params")
+        text_splitter = getattr(module, text_splitter_type)(**params)
+        return text_splitter
+
+    def _split_raw_document(self, raw_doc: list[Document]) -> list[Document]:
+        """
+        Splits a raw document into chunks.
+
+        Args:
+            raw_doc (list[Document]): The raw document.
+
+        Returns:
+            list[Document]: The split document.
+        """
+        return self._text_splitter.split_documents(raw_doc)
+
+    def _save_to_faiss_index(self, documents: list[Document], category: Intent) -> None:
+        """
+        Saves a document to the FAISS index.
+
+        Args:
+            documents (list[Document]): The document to be saved.
+
+        Returns:
+            None
+        """
+        faiss_root_dir = project_path("faiss")
+        faiss_category_dir = faiss_root_dir / category.value
+
+        # save the document to the faiss index
+        self._embedding_model.save_to_faiss_index(documents, faiss_category_dir)

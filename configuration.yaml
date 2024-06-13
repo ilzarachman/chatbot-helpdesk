@@ -6,8 +6,10 @@ intent_classifier:
 document_embedder:
   model: openaiembeddings
   text_splitter:
-    chunk_size: 100
-    chunk_overlap: 0
+    type: RecursiveCharacterTextSplitter
+    params:
+      chunk_size: 100
+      chunk_overlap: 0
 
 model_garden:
   gemini:
