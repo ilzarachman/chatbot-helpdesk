@@ -9,7 +9,7 @@ from .utils.path_utils import project_path
 from ..config import Configuration
 from langchain_community import document_loaders
 from langchain_community.document_loaders.base import BaseLoader
-from langchain_text_splitters import TextSplitter, RecursiveCharacterTextSplitter
+from langchain_text_splitters import TextSplitter
 import importlib
 
 
@@ -33,7 +33,9 @@ class DocumentEmbedder:
         self._embedding_model: TextEmbedder = ModelLoader.load_model(
             Configuration.get("document_embedder.model")
         )
-        self._text_splitter_config = Configuration.get("document_embedder.text_splitter")
+        self._text_splitter_config = Configuration.get(
+            "document_embedder.text_splitter"
+        )
         self._text_splitter: TextSplitter = self._get_text_splitter()
 
     def save_document_to_vectorstore(self, doc_path: str, doc_category: Intent) -> None:
@@ -89,9 +91,7 @@ class DocumentEmbedder:
             TextSplitter: The text splitter.
         """
         text_splitter_type = self._text_splitter_config.get("type")
-        module = importlib.import_module(
-            f"langchain_text_splitters"
-        )
+        module = importlib.import_module(f"langchain_text_splitters")
         params = self._text_splitter_config.get("params")
         text_splitter = getattr(module, text_splitter_type)(**params)
         return text_splitter
@@ -121,5 +121,8 @@ class DocumentEmbedder:
         faiss_root_dir = project_path("faiss")
         faiss_category_dir = faiss_root_dir / category.value
 
-        # save the document to the faiss index
-        self._embedding_model.save_to_faiss_index(documents, faiss_category_dir)
+        if not faiss_category_dir.exists():
+            self._embedding_model.save_to_faiss_index(documents, faiss_category_dir)
+            return
+
+        self._embedding_model.add_data_to_faiss_index(documents, faiss_category_dir)
