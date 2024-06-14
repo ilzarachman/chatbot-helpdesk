@@ -55,6 +55,7 @@ class TextEmbedder(ABC):
         try:
             db: FAISS = FAISS.from_documents(documents, self.model)
             db.save_local(f"{faiss_dir}")
+            logger.debug(f"Saved {len(documents)} documents to {faiss_dir} FAISS index.")
         except Exception as e:
             logger.error(f"Error saving to FAISS index: {e}")
 

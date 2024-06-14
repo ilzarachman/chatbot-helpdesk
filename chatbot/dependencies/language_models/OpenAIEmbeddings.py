@@ -1,4 +1,3 @@
-from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings as LangChainOpenAIEmbeddings
 
 from ..contracts.TextEmbedder import TextEmbedder
@@ -36,4 +35,3 @@ class OpenAIEmbeddings(TextEmbedder):
             Any
         """
         return self._model.embed_query(text)
-
