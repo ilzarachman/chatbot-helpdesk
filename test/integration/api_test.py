@@ -23,5 +23,5 @@ def test_root():
 
 
 def test_chat_prompt():
-    response = client.get(f"{api_prefix}/chat/prompt")
+    response = client.get(f"{api_prefix}/chat/prompt", params={"message": "Di kampus ada fasilitas apa saja?"})
     assert response.status_code == 200

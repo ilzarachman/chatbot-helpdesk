@@ -122,7 +122,7 @@ class IntentClassifier:
 
         return prompts
 
-    def classify(self, message: str) -> str:
+    def classify(self, message: str) -> Intent:
         """Classify the intent of the given message.
 
         This function takes a message as input and returns the intent of the message as a string.
@@ -135,4 +135,6 @@ class IntentClassifier:
         """
         prompts: list[Message] = self._build_prompt_with_examples(message)
 
-        return self._model.generate(prompts)
+        intent_str = self._model.generate(prompts)
+
+        return Intent(intent_str)

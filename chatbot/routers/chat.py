@@ -1,14 +1,14 @@
-from typing_extensions import Annotated
 from fastapi import APIRouter, Depends, Request
 from ..Application import Application
 from ..app import get_application
+from ..dependencies.IntentClassifier import Intent
 from ..logger import logger
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 @router.get("/prompt")
-async def handle_prompt(app: Application = Depends(get_application)):
+async def handle_prompt(req: Request, app: Application = Depends(get_application)):
     """
     Handles the "/prompt" GET request.
 
@@ -17,5 +17,8 @@ async def handle_prompt(app: Application = Depends(get_application)):
     Returns:
         dict
     """
-    logger.debug(app)
-    return {"message": "Handled"}
+    message: str = req.query_params.get("message")
+    intent: Intent = app.intent_classifier.classify(message)
+    print(intent)
+
+    return {"intent": intent}
