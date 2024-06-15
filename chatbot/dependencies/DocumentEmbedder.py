@@ -31,7 +31,7 @@ class DocumentEmbedder:
     def __init__(self):
         """Initialize the DocumentEmbedder class."""
         self._embedding_model: TextEmbedder = ModelLoader.load_model(
-            Configuration.get("document_embedder.model")
+            Configuration.get("document_embedder.embedding_model")
         )
         self._text_splitter_config = Configuration.get(
             "document_embedder.text_splitter"

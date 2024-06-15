@@ -4,12 +4,15 @@ intent_classifier:
     temperature: 0
 
 document_embedder:
-  model: openaiembeddings
+  embedding_model: openaiembeddings
   text_splitter:
     type: RecursiveCharacterTextSplitter
     params:
       chunk_size: 100
       chunk_overlap: 0
+
+information_retriever:
+  embedding_model: openaiembeddings
 
 model_garden:
   gemini:
