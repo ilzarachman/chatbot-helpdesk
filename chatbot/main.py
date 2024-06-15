@@ -1,14 +1,18 @@
 from dotenv import load_dotenv
-from chatbot.Application import Application
+
 from chatbot.config import Configuration
-from chatbot.dependencies.IntentClassifier import IntentClassifier
-from chatbot.dependencies.DocumentEmbedder import DocumentEmbedder
-from chatbot.dependencies.InformationRetriever import InformationRetriever
-from chatbot.dependencies.ResponseGenerator import ResponseGenerator
 from chatbot.logger import configure_logging, logger
 from fastapi import FastAPI
 from chatbot.routers import router
+from .app import set_application
 import os
+from .Application import Application
+from .dependencies.DocumentEmbedder import DocumentEmbedder
+from .dependencies.InformationRetriever import InformationRetriever
+from .dependencies.IntentClassifier import IntentClassifier
+from .dependencies.ResponseGenerator import ResponseGenerator
+
+load_dotenv(override=True)
 
 
 def load_configuration_file(path: str = "configuration.yaml"):
@@ -33,13 +37,18 @@ def setup_server() -> FastAPI:
     Raises:
         None
     """
-    server = FastAPI()
-    server.state.application = Application(
-        intent_classifier=IntentClassifier(),
-        document_embedder=DocumentEmbedder(),
-        information_retriever=InformationRetriever(),
-        response_generator=ResponseGenerator(),
+    configure_logging()  # Configure logging
+    load_configuration_file("configuration.yaml")
+
+    set_application(
+        Application(
+            intent_classifier=IntentClassifier(),
+            document_embedder=DocumentEmbedder(),
+            information_retriever=InformationRetriever(),
+            response_generator=ResponseGenerator(),
+        )
     )
+    server = FastAPI()
     server.include_router(router)
 
     return server
@@ -78,11 +87,8 @@ def main():
     Returns:
         None
     """
-    configure_logging()  # Configure logging
-
-    # Load the configuration from the specified YAML file.
-    load_configuration_file("configuration.yaml")
     run_app(setup_server())
+
 
 if __name__ == "__main__":
     main()
