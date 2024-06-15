@@ -1,5 +1,7 @@
 import os
 import unittest
+
+import pytest
 from dotenv import load_dotenv
 import faiss
 
@@ -24,6 +26,7 @@ class TestDocumentEmbedder(unittest.TestCase):
     def test_instance_init(self):
         self.assertIsInstance(self._instance, DocumentEmbedder)
 
+    @pytest.mark.generation
     def test_save_document_to_vectorstore(self):
         self._instance.save_document_to_vectorstore(
             str(project_path("test", "data", "text.txt")),

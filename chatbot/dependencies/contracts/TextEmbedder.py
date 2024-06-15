@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
+
+from ..utils.path_utils import project_path
 from ...logger import logger
 
 
@@ -55,9 +57,12 @@ class TextEmbedder(ABC):
         try:
             db: FAISS = FAISS.from_documents(documents, self.model)
             db.save_local(f"{faiss_dir}")
-            logger.debug(f"Saved {len(documents)} documents to {faiss_dir} FAISS index.")
+            logger.debug(
+                f"Saved {len(documents)} documents to {faiss_dir} FAISS index."
+            )
         except Exception as e:
             logger.error(f"Error saving to FAISS index: {e}")
+            raise Exception(f"Error saving to FAISS index: {e}")
 
     def add_data_to_faiss_index(self, documents: list[Document], faiss_dir: str):
         """
@@ -84,3 +89,29 @@ class TextEmbedder(ABC):
             )
         except Exception as e:
             logger.error(f"Error adding data to FAISS index: {e}")
+            raise Exception(f"Error adding data to FAISS index: {e}")
+
+    def load_intent_faiss_index(self, intent_value: str) -> FAISS:
+        """
+        Load the FAISS index for the intent.
+
+        Args:
+            intent_value (str): The value of the intent.
+
+        Returns:
+            FAISS: The FAISS index for the intent.
+
+        Raises:
+            Exception: Error loading the FAISS index.
+        """
+        try:
+            faiss_root_dir = project_path("faiss")
+            faiss_intent_dir = faiss_root_dir / intent_value
+            return FAISS.load_local(
+                f"{faiss_intent_dir}", self.model, allow_dangerous_deserialization=True
+            )
+        except FileNotFoundError:
+            logger.error(f"FAISS index for {intent_value} not found.")
+            raise FileNotFoundError(f"FAISS index for {intent_value} not found.")
+        except Exception as e:
+            raise Exception(f"Error loading the FAISS index: {e}")
