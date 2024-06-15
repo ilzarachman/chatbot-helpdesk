@@ -25,21 +25,25 @@ class TestIntentClassifier(unittest.TestCase):
         list_intents = Intent.list()
         self.assertIsInstance(list_intents, list)
 
+    @pytest.mark.using_llm
     @pytest.mark.generation
     def test_classify_returns_intent_other(self):
         intent = self._intent_classifier.classify("Halo, apa kabar?")
         self.assertEqual(intent, Intent.OTHER.value)
 
+    @pytest.mark.using_llm
     @pytest.mark.generation
     def test_classify_returns_intent_academic(self):
         intent = self._intent_classifier.classify("Jurusan apa saja yang ada di kampus?")
         self.assertEqual(intent, Intent.ACADEMIC_ADMINISTRATION.value)
 
+    @pytest.mark.using_llm
     @pytest.mark.generation
     def test_classify_returns_intent_resource(self):
         intent = self._intent_classifier.classify("Toilet kampus ada di mana?")
         self.assertEqual(intent, Intent.RESOURCE_SERVICE.value)
 
+    @pytest.mark.using_llm
     @pytest.mark.generation
     def test_classify_returns_intent_support(self):
         intent = self._intent_classifier.classify("Saya mau melapor masalah dengan AC di ruangan 101.")

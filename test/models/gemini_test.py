@@ -19,6 +19,7 @@ class TestGemini(unittest.TestCase):
         cls._instance = Gemini()
         return super().setUpClass()
 
+    @pytest.mark.using_llm
     @pytest.mark.generation
     def test_generate_text_integration(self):
         text = self._instance.generate([
@@ -34,6 +35,7 @@ class TestGemini(unittest.TestCase):
         self.assertIsNotNone(text)
         self.assertIsInstance(text, str)
 
+    @pytest.mark.using_llm
     @pytest.mark.generation
     def test_streaming_text_returns_generator_integration(self):
         generator = self._instance.stream([UserMessage("This is a prompt.")])

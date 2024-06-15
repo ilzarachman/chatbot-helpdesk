@@ -26,7 +26,7 @@ class TestDocumentEmbedder(unittest.TestCase):
     def test_instance_init(self):
         self.assertIsInstance(self._instance, DocumentEmbedder)
 
-    @pytest.mark.generation
+    @pytest.mark.using_llm
     def test_save_document_to_vectorstore(self):
         self._instance.save_document_to_vectorstore(
             str(project_path("test", "data", "text.txt")),
