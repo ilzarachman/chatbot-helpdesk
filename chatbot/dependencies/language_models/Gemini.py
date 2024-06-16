@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from typing import Generator, Optional
+from typing import Generator, Optional, Union
 
 from chatbot.dependencies.contracts.message import (
     AssistantMessage,
@@ -87,7 +87,9 @@ class Gemini(TextGenerator):
                 if isinstance(msg, UserMessage):
                     casted_messages.append(str(Gemini.GeminiUserMessage(msg.message)))
                 elif isinstance(msg, AssistantMessage):
-                    casted_messages.append(str(Gemini.GeminiAssistantMessage(msg.message)))
+                    casted_messages.append(
+                        str(Gemini.GeminiAssistantMessage(msg.message))
+                    )
                 elif isinstance(msg, SystemMessage):
                     casted_messages.append(str(Gemini.GeminiSystemMessage(msg.message)))
 
@@ -119,6 +121,29 @@ class Gemini(TextGenerator):
             logger.error(e)
             raise RuntimeError("[Generation failed] " + str(e))
 
+    async def _generate_async(
+        self, prompt: str, config: GenerationConfig, **kwargs
+    ) -> generation_types.AsyncGenerateContentResponse:
+        """
+        Generate text using the Google Generative AI model.
+
+        Args:
+            prompt: The text to generate from.
+            config: The generation config.
+
+        Returns:
+            The generated text.
+
+        """
+        try:
+            res = await self.model.generate_content_async(
+                prompt, generation_config=config, **kwargs
+            )
+            return res
+        except Exception as e:
+            logger.error(e)
+            raise RuntimeError("[Generation failed] " + str(e))
+
     def generate(self, prompt: list[Message], config: Optional[dict] = None) -> str:
         """
         Generate text using the LangChain Google Generative AI model.
@@ -140,7 +165,7 @@ class Gemini(TextGenerator):
             logger.debug(f"[Generated]: {text}")
             return str(text)
         except ValueError as e:
-            logger.warning(e)
+            logger.error(e)
             return self._handle_value_error(e, res)
 
     def stream(
@@ -172,9 +197,39 @@ class Gemini(TextGenerator):
             logger.warning(e)
             yield self._handle_value_error(e, res)
 
+    async def generate_async(
+        self, prompt: list[Message], config: Optional[dict] = None
+    ) -> str:
+        """
+        Generate text using the LangChain Google Generative AI model.
+
+        Args:
+            prompt: The text to generate from.
+            config: The generation config.
+
+        Returns:
+            The generated text.
+
+        """
+        config = GenerationConfig() if config is None else GenerationConfig(**config)
+        prompt = self._gemini_messages_to_str(prompt)
+        res = await self._generate_async(prompt, config)
+        try:
+            await res.resolve()
+            text = Gemini.GeminiResponse(res.text)
+            logger.debug(f"[Generated]: {text}")
+            return str(text)
+        except ValueError as e:
+            logger.error(e)
+            return self._handle_value_error(e, res)
+
     @staticmethod
     def _handle_value_error(
-        e: ValueError, response: generation_types.GenerateContentResponse
+        e: ValueError,
+        response: Union[
+            generation_types.GenerateContentResponse,
+            generation_types.AsyncGenerateContentResponse,
+        ],
     ) -> str:
         """
         Handle the ValueError exception.

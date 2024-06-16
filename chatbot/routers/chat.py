@@ -3,12 +3,17 @@ from ..Application import Application
 from ..app import get_application
 from ..dependencies.IntentClassifier import Intent
 from ..logger import logger
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
-@router.get("/prompt")
-async def handle_prompt(req: Request, app: Application = Depends(get_application)):
+class ChatMessage(BaseModel):
+    message: str
+
+
+@router.post("/prompt")
+async def chat_prompt(message: str, app: Application = Depends(get_application)):
     """
     Handles the "/prompt" GET request.
 
@@ -17,8 +22,7 @@ async def handle_prompt(req: Request, app: Application = Depends(get_application
     Returns:
         dict
     """
-    message: str = req.query_params.get("message")
-    intent: Intent = app.intent_classifier.classify(message)
-    print(intent)
+    intent: Intent = await app.intent_classifier.classify(message)
+    print(type(intent))
 
     return {"intent": intent}

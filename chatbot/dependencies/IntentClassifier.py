@@ -26,6 +26,18 @@ class Intent(StringEnum):
             _intents.append(intent.value)
         return _intents
 
+    @staticmethod
+    def get_intent(intent_value: str) -> "Intent":
+        """
+        Helper method to get the intent from the intent classifier config.
+
+        Args:
+            intent_value: The string representation of the intent.
+
+        Returns:
+            Intent: The corresponding Intent enum object.
+        """
+        return Intent.__members__.get(intent_value.upper(), Intent.OTHER)
 
 class IntentDescription:
     """
@@ -122,7 +134,7 @@ class IntentClassifier:
 
         return prompts
 
-    def classify(self, message: str) -> Intent:
+    async def classify(self, message: str) -> Intent:
         """Classify the intent of the given message.
 
         This function takes a message as input and returns the intent of the message as a string.
@@ -135,6 +147,6 @@ class IntentClassifier:
         """
         prompts: list[Message] = self._build_prompt_with_examples(message)
 
-        intent_str = self._model.generate(prompts)
+        intent_str = await self._model.generate_async(prompts)
 
         return Intent(intent_str)

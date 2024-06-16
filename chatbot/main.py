@@ -4,13 +4,13 @@ from chatbot.config import Configuration
 from chatbot.logger import configure_logging, logger
 from fastapi import FastAPI
 from chatbot.routers import router
-from .app import set_application
+from chatbot.app import set_application
 import os
-from .Application import Application
-from .dependencies.DocumentEmbedder import DocumentEmbedder
-from .dependencies.InformationRetriever import InformationRetriever
-from .dependencies.IntentClassifier import IntentClassifier
-from .dependencies.ResponseGenerator import ResponseGenerator
+from chatbot.Application import Application
+from chatbot.dependencies.DocumentEmbedder import DocumentEmbedder
+from chatbot.dependencies.InformationRetriever import InformationRetriever
+from chatbot.dependencies.IntentClassifier import IntentClassifier
+from chatbot.dependencies.ResponseGenerator import ResponseGenerator
 
 load_dotenv(override=True)
 

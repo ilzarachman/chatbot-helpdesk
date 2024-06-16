@@ -7,44 +7,40 @@ from chatbot.config import Configuration
 from chatbot.dependencies.IntentClassifier import IntentClassifier, Intent
 
 load_dotenv(override=True)
+Configuration(path="configuration.yaml")
+
+_intent_classifier: IntentClassifier = IntentClassifier()
 
 
-class TestIntentClassifier(unittest.TestCase):
-    _intent_classifier: IntentClassifier = None
+def test_intent_classifier():
+    assert isinstance(_intent_classifier, IntentClassifier)
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        Configuration(path="configuration.yaml")
-        cls._intent_classifier = IntentClassifier()
-        return super().setUpClass()
 
-    def test_intent_classifier(self):
-        self.assertIsInstance(self._intent_classifier, IntentClassifier)
+def test_intent_list_returns_list():
+    list_intents = Intent.list()
+    assert isinstance(list_intents, list)
 
-    def test_intent_list_returns_list(self):
-        list_intents = Intent.list()
-        self.assertIsInstance(list_intents, list)
 
-    @pytest.mark.using_llm
-    @pytest.mark.generation
-    def test_classify_returns_intent_other(self):
-        intent = self._intent_classifier.classify("Halo, apa kabar?")
-        self.assertEqual(intent, Intent.OTHER.value)
+@pytest.mark.using_llm
+@pytest.mark.generation
+@pytest.mark.asyncio
+async def test_classify_returns_intent_support():
+    intent = await _intent_classifier.classify(
+        "Saya mau melapor masalah dengan AC di ruangan 101."
+    )
+    assert intent == Intent.SUPPORT
 
-    @pytest.mark.using_llm
-    @pytest.mark.generation
-    def test_classify_returns_intent_academic(self):
-        intent = self._intent_classifier.classify("Jurusan apa saja yang ada di kampus?")
-        self.assertEqual(intent, Intent.ACADEMIC_ADMINISTRATION.value)
+    intent = await _intent_classifier.classify(
+        "Halo, apa kabar?"
+    )
+    assert intent == Intent.OTHER
 
-    @pytest.mark.using_llm
-    @pytest.mark.generation
-    def test_classify_returns_intent_resource(self):
-        intent = self._intent_classifier.classify("Toilet kampus ada di mana?")
-        self.assertEqual(intent, Intent.RESOURCE_SERVICE.value)
+    intent = await _intent_classifier.classify(
+        "Toilet kampus ada di mana?"
+    )
+    assert intent == Intent.RESOURCE_SERVICE
 
-    @pytest.mark.using_llm
-    @pytest.mark.generation
-    def test_classify_returns_intent_support(self):
-        intent = self._intent_classifier.classify("Saya mau melapor masalah dengan AC di ruangan 101.")
-        self.assertEqual(intent, Intent.SUPPORT.value)
+    intent = await _intent_classifier.classify(
+        "Jurusan apa saja yang ada di kampus?"
+    )
+    assert intent == Intent.ACADEMIC_ADMINISTRATION

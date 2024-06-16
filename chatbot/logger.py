@@ -10,6 +10,7 @@ class CustomFormatter(logging.Formatter):
     """
     Custom logging formatter that allows different colors for different log levels.
     """
+
     grey = "\033[90m"
     yellow = "\033[93m"
     red = "\033[91m"
@@ -48,7 +49,6 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-
 class CustomJSONFormatter(logging.Formatter):
     """
     Custom JSON formatter for logging.
@@ -85,6 +85,7 @@ class CustomJSONFormatter(logging.Formatter):
         # Convert the dictionary to JSON
         return json.dumps(log_dict)
 
+
 class InfoAndErrorFilter(logging.Filter):
     """
     Filter for log records at the INFO and ERROR levels.
@@ -101,7 +102,6 @@ class InfoAndErrorFilter(logging.Filter):
             bool: True if the record should be logged; False otherwise.
         """
         return record.levelno in [logging.INFO, logging.ERROR]
-
 
 
 def configure_logging():
@@ -127,7 +127,7 @@ def configure_logging():
     log_folder = "logs"
     if not os.path.exists(log_folder):
         os.makedirs(log_folder)
-    
+
     logging.config.dictConfig(
         {
             "version": 1,
@@ -143,9 +143,7 @@ def configure_logging():
                 },
             },
             "filters": {
-                "only_info_and_error": {
-                    "()": InfoAndErrorFilter
-                },
+                "only_info_and_error": {"()": InfoAndErrorFilter},
             },
             "handlers": {
                 "root_file": {
