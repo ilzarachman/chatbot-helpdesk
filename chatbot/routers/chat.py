@@ -10,6 +10,9 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 class ChatMessage(BaseModel):
+    """
+    ChatMessage model.
+    """
     message: str
 
 
@@ -23,9 +26,9 @@ async def chat_prompt(chat_message: ChatMessage, app: Application = Depends(get_
     Returns:
         dict
     """
+    logger.debug(f"Received message: {chat_message.message}")
     message: str = chat_message.message
     intent: Intent = await app.intent_classifier.classify(message)
-    logger.debug(f"Detected intent: {intent}")
 
     handler = IntentHandlerFactory.get_handler(intent)
     response = await handler.with_app(app).handle(message)

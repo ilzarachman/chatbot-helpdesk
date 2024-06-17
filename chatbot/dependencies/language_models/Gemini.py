@@ -223,6 +223,33 @@ class Gemini(TextGenerator):
             logger.error(e)
             return self._handle_value_error(e, res)
 
+    async def stream_async(self, prompt: list[Message], config: Optional[dict] = None) -> Generator[str, None, None]:
+        """
+        Generate text stream using the Google Generative AI model.
+
+        Args:
+            prompt: The text to generate from.
+            config: The generation config.
+
+        Returns:
+            The generated text stream.
+
+        Raises:
+            ValueError: If the response is not valid.
+        """
+        config = GenerationConfig() if config is None else GenerationConfig(**config)
+        prompt = self._gemini_messages_to_str(prompt)
+        res = await self._generate_async(prompt, config, stream=True)
+        try:
+            async for chunk in res:
+                if "</msg>" in chunk.text:
+                    yield str(Gemini.GeminiResponse(chunk.text))
+                    continue
+                yield chunk.text
+        except ValueError as e:
+            logger.warning(e)
+            yield self._handle_value_error(e, res)
+
     @staticmethod
     def _handle_value_error(
         e: ValueError,

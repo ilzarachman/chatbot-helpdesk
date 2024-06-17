@@ -38,6 +38,20 @@ class TextGenerator(ABC):
         pass
 
     @abstractmethod
+    async def stream_async(self, prompt: list[Message], config: Optional[dict] = None) -> Generator[str, None, None]:
+        """
+        Generate a text stream based on the input.
+
+        Parameters:
+            prompt (str): The input text.
+            config (dict, optional): The generation config.
+
+        Yields:
+            str: The generated text stream.
+        """
+        pass
+
+    @abstractmethod
     def stream(self, prompt: list[Message], config: Optional[dict] = None) -> Generator[str, None, None]:
         """
         Generate a text stream based on the input.

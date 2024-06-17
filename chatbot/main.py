@@ -45,7 +45,6 @@ def setup_server() -> FastAPI:
             intent_classifier=IntentClassifier(),
             document_embedder=DocumentEmbedder(),
             information_retriever=InformationRetriever(),
-            response_generator=ResponseGenerator(),
         )
     )
     server = FastAPI()
