@@ -14,7 +14,7 @@ class ChatMessage(BaseModel):
 
 
 @router.post("/prompt")
-async def chat_prompt(message: str, app: Application = Depends(get_application)):
+async def chat_prompt(chat_message: ChatMessage, app: Application = Depends(get_application)):
     """
     Handles the "/prompt" GET request.
 
@@ -23,6 +23,7 @@ async def chat_prompt(message: str, app: Application = Depends(get_application))
     Returns:
         dict
     """
+    message: str = chat_message.message
     intent: Intent = await app.intent_classifier.classify(message)
     logger.debug(f"Detected intent: {intent}")
 
