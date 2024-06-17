@@ -1,4 +1,4 @@
-from ..contracts.BaseIntentHandler import BaseIntentHandler
+from chatbot.dependencies.contracts.BaseIntentHandler import BaseIntentHandler
 
 
 class SupportIntentHandler(BaseIntentHandler):

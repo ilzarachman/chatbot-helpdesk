@@ -1,10 +1,30 @@
 from abc import ABC, abstractmethod
+from pydantic import BaseModel
+
+from chatbot.Application import Application
 
 
 class BaseIntentHandler(ABC):
     """
     Base class for intent handlers. An intent handler is responsible for handling an intent.
     """
+
+    def __init__(self):
+        self._application = None
+
+    def with_app(self, application: Application) -> "BaseIntentHandler":
+        """
+        Sets the application instance.
+
+        Parameters:
+            application (Application): The application instance.
+
+        Returns:
+            BaseIntentHandler: The intent handler instance.
+        """
+        self._application = application
+        return self
+
     @abstractmethod
     async def handle(self, message: str) -> str:
         """

@@ -2,8 +2,8 @@ from .AcademicAdministrationIntentHandler import AcademicAdministrationIntentHan
 from .OtherIntentHandler import OtherIntentHandler
 from .ResourceServiceIntentHandler import ResourceServiceIntentHandler
 from .SupportIntentHandler import SupportIntentHandler
-from ..IntentClassifier import Intent
-from ..contracts.BaseIntentHandler import BaseIntentHandler
+from chatbot.dependencies.IntentClassifier import Intent
+from chatbot.dependencies.contracts.BaseIntentHandler import BaseIntentHandler
 
 
 class IntentHandlerFactory:
