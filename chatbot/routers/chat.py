@@ -22,7 +22,11 @@ async def chat_prompt(message: str, app: Application = Depends(get_application))
     Returns:
         dict
     """
+    # TODO: implement this function:
+    # 1. classify the intent of the message
+    # 2. handle the specific intent (may need separate file for each intent)
+    # 3. generate the response using response generator
     intent: Intent = await app.intent_classifier.classify(message)
-    print(type(intent))
+    logger.debug(f"Detected intent: {intent}")
 
     return {"intent": intent}
