@@ -39,6 +39,7 @@ class Intent(StringEnum):
         """
         return Intent.__members__.get(intent_value.upper(), Intent.OTHER)
 
+
 class IntentDescription:
     """
     This class is used to get the description of an intent.
@@ -147,6 +148,8 @@ class IntentClassifier:
         """
         prompts: list[Message] = self._build_prompt_with_examples(message)
 
-        intent_str = await self._model.generate_async(prompts)
+        intent_str = await self._model.generate_async(
+            prompts, self._intent_classifier_config.get("model_settings")
+        )
 
         return Intent(intent_str)
