@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generator, Optional, Union
+from typing import Generator, Optional, Union, AsyncGenerator
 
 from chatbot.dependencies.contracts.message import Message
 
@@ -38,7 +38,7 @@ class TextGenerator(ABC):
         pass
 
     @abstractmethod
-    async def stream_async(self, prompt: list[Message], config: Optional[dict] = None) -> Generator[str, None, None]:
+    async def stream_async(self, prompt: list[Message], config: Optional[dict] = None) -> AsyncGenerator[str, None]:
         """
         Generate a text stream based on the input.
 

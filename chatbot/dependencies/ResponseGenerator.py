@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Generator, AsyncGenerator
 
 from chatbot.config import Configuration
 from chatbot.dependencies.ModelLoader import ModelLoader
@@ -54,7 +54,7 @@ class ResponseGenerator:
 
         return prompts
 
-    async def response_async(self, message: str) -> str:
+    async def response_async(self, message: str) -> AsyncGenerator[str, None]:
         """
         Generate a response based on the input.
 
@@ -67,8 +67,8 @@ class ResponseGenerator:
             str: The response string.
         """
         prompts: list[Message] = self._build_prompt_with_examples(message)
-        res = await self._model.stream_async(
+        res = self._model.stream_async(
             prompts, self._config.get("model_settings")
         )
-        for chunk in res:
+        async for chunk in res:
             yield chunk
