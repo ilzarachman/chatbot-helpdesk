@@ -1,7 +1,8 @@
 import json
 import os
 import re
-from typing import Generator, Optional, Union, AsyncGenerator
+from contextlib import asynccontextmanager
+from typing import Generator, Optional, Union, AsyncGenerator, AsyncIterator
 
 from chatbot.dependencies.contracts.message import (
     AssistantMessage,
@@ -225,7 +226,7 @@ class Gemini(TextGenerator):
 
     async def stream_async(
         self, prompt: list[Message], config: Optional[dict] = None
-    ) -> AsyncGenerator[str, None]:
+    ) -> AsyncIterator[str]:
         """
         Generate text stream using the Google Generative AI model.
 
