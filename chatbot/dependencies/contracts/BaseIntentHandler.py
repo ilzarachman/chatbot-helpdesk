@@ -10,8 +10,6 @@ from chatbot.dependencies.IntentClassifier import Intent, IntentClassifier
 from chatbot.dependencies.PromptManager import PromptManager
 from chatbot.dependencies.contracts.message import Message, UserMessage
 
-# TODO: Implement response generator in each intent handlers
-
 
 class BaseIntentHandler(ABC):
     """
