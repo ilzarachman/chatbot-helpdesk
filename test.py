@@ -18,7 +18,7 @@ def main():
     elif args.marker == "unit":
         pytest.main(["-m", "not integration"])
     elif args.marker == "all":
-        print("All test is disabled currently!")
+        pytest.main([])
 
 
 if __name__ == "__main__":
