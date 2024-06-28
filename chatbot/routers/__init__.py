@@ -6,7 +6,7 @@ router.include_router(chat_router)
 
 
 @router.get("/")
-def handle_root():
+def root():
     """
     Handles the "/" GET request.
 

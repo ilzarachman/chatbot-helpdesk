@@ -110,3 +110,6 @@ class Configuration:
             dict: A dictionary containing all the key-value pairs in the configuration data.
         """
         return cls._instance.data
+
+
+Configuration("configuration.yaml")

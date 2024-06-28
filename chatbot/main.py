@@ -4,28 +4,15 @@ from chatbot.config import Configuration
 from chatbot.logger import configure_logging, logger
 from fastapi import FastAPI
 from chatbot.routers import router
-from .app import set_application
+from chatbot.app import set_application
 import os
-from .Application import Application
-from .dependencies.DocumentEmbedder import DocumentEmbedder
-from .dependencies.InformationRetriever import InformationRetriever
-from .dependencies.IntentClassifier import IntentClassifier
-from .dependencies.ResponseGenerator import ResponseGenerator
+from chatbot.Application import Application
+from chatbot.dependencies.DocumentEmbedder import DocumentEmbedder
+from chatbot.dependencies.InformationRetriever import InformationRetriever
+from chatbot.dependencies.IntentClassifier import IntentClassifier
+from chatbot.dependencies.ResponseGenerator import ResponseGenerator
 
 load_dotenv(override=True)
-
-
-def load_configuration_file(path: str = "configuration.yaml"):
-    """
-    Loads a configuration file and initializes a `Configuration` object.
-
-    Args:
-        path (str, optional): The path to the configuration file. Defaults to "configuration.yaml".
-
-    Returns:
-        None
-    """
-    Configuration(path=path)
 
 
 def setup_server() -> FastAPI:
@@ -38,14 +25,12 @@ def setup_server() -> FastAPI:
         None
     """
     configure_logging()  # Configure logging
-    load_configuration_file("configuration.yaml")
 
     set_application(
         Application(
             intent_classifier=IntentClassifier(),
             document_embedder=DocumentEmbedder(),
             information_retriever=InformationRetriever(),
-            response_generator=ResponseGenerator(),
         )
     )
     server = FastAPI()

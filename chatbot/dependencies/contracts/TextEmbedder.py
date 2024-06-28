@@ -108,7 +108,9 @@ class TextEmbedder(ABC):
             faiss_root_dir = project_path("faiss")
             faiss_intent_dir = faiss_root_dir / intent_value
             return FAISS.load_local(
-                f"{faiss_intent_dir}", self.model, allow_dangerous_deserialization=True
+                f"{faiss_intent_dir}",
+                self.model,
+                allow_dangerous_deserialization=True,
             )
         except FileNotFoundError:
             logger.error(f"FAISS index for {intent_value} not found.")

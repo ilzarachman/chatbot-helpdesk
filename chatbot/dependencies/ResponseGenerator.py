@@ -1,17 +1,75 @@
+from typing import Optional, Generator, AsyncGenerator, AsyncIterator
+
+from chatbot.config import Configuration
+from chatbot.dependencies.ModelLoader import ModelLoader
+from chatbot.dependencies.contracts.TextGenerator import TextGenerator
+from chatbot.dependencies.contracts.message import Message, SystemMessage, UserMessage
+
 
 class ResponseGenerator:
-    def __init__(self):
-        pass
+    """
+    This class represents the response generator.
+    """
 
-    def generate(self, input: str) -> str:
-        """Generate a response based on the input.
-
-        This function takes a string as input and returns a string as a response.
+    def __init__(self, prompt_template: str):
+        """
+        Initialize the response generator.
 
         Parameters:
-            input (str): The input string.
+            prompt_template (str): The prompt template.
+        """
+        self._prompt_template: str = prompt_template
+        self._config: dict = Configuration.get("response_generator")
+        self._model: TextGenerator = ModelLoader.load_model(
+            self._config.get("generator_model")
+        )
+
+    @staticmethod
+    def with_prompt_template(prompt_template: str) -> "ResponseGenerator":
+        """
+        Create a response generator with a prompt template.
+
+        Parameters:
+            prompt_template (str): The prompt template.
 
         Returns:
+            ResponseGenerator: The response generator.
+        """
+        return ResponseGenerator(prompt_template)
+
+    def _build_prompt_with_examples(self, message: str) -> list[Message]:
+        """
+        Helper method to build the prompt with example.
+
+        Parameters:
+            message (str): The message to be classified.
+
+        Returns:
+            list[Message]: The list of messages.
+        """
+        prompts: list[Message] = [
+            SystemMessage(self._prompt_template),
+            UserMessage(message),
+        ]
+
+        return prompts
+
+    async def response_async(self, message: str) -> AsyncIterator[str]:
+        """
+        Generate a response based on the input.
+
+        This function takes a string as input and returns a string iterator as a response.
+
+        Parameters:
+            message (str): The input string.
+
+        Yields:
             str: The response string.
         """
-        return "This is a response to " + input
+        prompts: list[Message] = self._build_prompt_with_examples(message)
+        async_res = self._model.stream_async(
+            prompts, self._config.get("model_settings")
+        )
+
+        async for chunk in aiter(async_res):
+            yield chunk

@@ -1,19 +1,24 @@
 import pytest
-import sys
 import argparse
 
 
 def main():
     parser = argparse.ArgumentParser(description="Run pytest with a specified marker.")
     parser.add_argument(
-        "-m",
-        "--marker",
-        default="not generation",
-        help="Specify the marker expression for pytest.",
+        "marker",
+        help="Specify the pytest marker to run",
+        default="all",
+        choices=["integration", "unit", "all"],
     )
     args = parser.parse_args()
 
-    pytest.main(["-m", args.marker])
+    # Run pytest with the specified marker
+    if args.marker == "integration":
+        pytest.main(["-m", "integration"])
+    elif args.marker == "unit":
+        pytest.main(["-m", "not integration"])
+    elif args.marker == "all":
+        pytest.main([])
 
 
 if __name__ == "__main__":

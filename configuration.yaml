@@ -14,6 +14,11 @@ document_embedder:
 information_retriever:
   embedding_model: openaiembeddings
 
+response_generator:
+  generator_model: gemini
+  model_settings:
+    temperature: 0
+
 model_garden:
   gemini:
     name: Gemini
