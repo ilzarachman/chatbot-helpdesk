@@ -32,9 +32,9 @@ class TestAPIIntegration:
         assert response.status_code == 200
         assert response.json() == {"message": "Server is running"}
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio(scope="session")
     async def test_chat_prompt(self, client):
-        response = await client.post(
+        response = client.post(
             client.app.url_path_for("chat_prompt"), json={"message": "hello"}
         )
         assert response.status_code == 200
