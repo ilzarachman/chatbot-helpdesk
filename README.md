@@ -2,7 +2,7 @@
 
 ## Project Name
 
-This project is a chatbot designed to provide helpdesk support. It is built using [insert relevant technologies, e.g., FastAPI, LangChain] and aims to [briefly describe the chatbot's purpose, e.g., automate common inquiries, provide self-service support, etc.].
+This project is a chatbot designed to provide helpdesk support. It is built using FastAPI backend and aims to [briefly describe the chatbot's purpose, e.g., automate common inquiries, provide self-service support, etc.].
 
 ## Features
 
@@ -14,23 +14,23 @@ This project is a chatbot designed to provide helpdesk support. It is built usin
 ## Installation
 
 1. **Prerequisites:**
-   - Python [version]
-   - [List any other required dependencies, e.g., pip, virtualenv]
+   - Python 3.10
+   - Poetry
+   - OpenAI API Key (You can get it from https://platform.openai.com/account/api-keys)
+   - Gemini API Key (You can get it from https://aistudio.google.com/app/apikey)
 
 2. **Steps:**
-   - Clone the repository: `git clone https://github.com/your-username/chatbot-helpdes.git`
+   - Clone the repository: `git clone https://github.com/your-username/chatbot-helpdesk.git`
    - Navigate to the project directory: `cd chatbot-helpdes`
-   - Create a virtual environment: `python -m venv .ven
-v`
-   - Activate the virtual environment:
-     - **Windows:** `.venv\Scripts\activate`
-     - **macOS/Linux:** `source .venv/bin/activate`
-   - Install dependencies: `pip install -r requirements.txt`
+   - Create a Poetry virtual environment: `poetry install`
+   - Run the server: `poetry run python chatbot/main.py`
 
-## Usage
-
-1. **[Instructions on how to run the chatbot, e.g., `python main.py`]**
-2. **[Provide any additional instructions, e.g., how to configure the chatbot, how to interact with it, etc.]**
+3. **Testing:**
+   
+    Run the tests using `pytest` or you can run 
+    ```shell
+    poetry run python test.py all
+    ```
 
 ## Contributing
 
@@ -41,6 +41,14 @@ Contributions are welcome! Please follow these steps:
 3. **Make your changes and commit them with descriptive commit messages.**
 4. **Push your changes to your fork.**
 5. **Submit a pull request.**
+
+## Development Logs
+- [x] Implementasi OOP dengan FastAPI Backend untuk mempermudah proses development.
+- [x] Unit testing dan integration testing.
+- [ ] Database management.
+- [ ] Frontend development.
+  - [ ] Implementasi UI.
+- [ ] Deployment.
 
 ## License
 
