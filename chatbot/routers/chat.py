@@ -33,4 +33,6 @@ async def chat_prompt(chat_message: ChatMessage, app: Application = Depends(get_
     handler = IntentHandlerFactory.get_handler(intent)
     response = await handler.with_app(app).handle(message)
 
+    # TODO: This must be returned in streaming, so find a way to do it.
+
     return {"response": response}

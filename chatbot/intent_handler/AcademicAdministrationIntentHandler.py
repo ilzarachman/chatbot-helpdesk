@@ -1,3 +1,5 @@
+from typing import AsyncIterator
+
 from chatbot.dependencies.IntentClassifier import Intent
 from chatbot.dependencies.ResponseGenerator import ResponseGenerator
 from chatbot.dependencies.contracts.BaseIntentHandler import BaseIntentHandler
@@ -14,7 +16,7 @@ class AcademicAdministrationIntentHandler(BaseIntentHandler):
         super().__init__()
         self.with_prompt_template(self._intent)
 
-    async def handle(self, message: str) -> str:
+    async def handle(self, message: str) -> AsyncIterator[str]:
         """
         Handles the intent of the message.
 
@@ -34,6 +36,8 @@ class AcademicAdministrationIntentHandler(BaseIntentHandler):
         prompt_template = self.build_prompt_with_information(information)
         # 3. generate the response
         response_generator = ResponseGenerator.with_prompt_template(prompt_template)
-        response = await response_generator.response_async(message)
+        response = response_generator.response_async(message)
+
+        # TODO: Find a way to return iteratively like maybe using async generator
 
         return response
