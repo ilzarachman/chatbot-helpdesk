@@ -15,19 +15,6 @@ from chatbot.dependencies.ResponseGenerator import ResponseGenerator
 load_dotenv(override=True)
 
 
-def load_configuration_file(path: str = "configuration.yaml"):
-    """
-    Loads a configuration file and initializes a `Configuration` object.
-
-    Args:
-        path (str, optional): The path to the configuration file. Defaults to "configuration.yaml".
-
-    Returns:
-        None
-    """
-    Configuration(path=path)
-
-
 def setup_server() -> FastAPI:
     """
     Sets up a FastAPI server instance with an initialized Application and included router.
@@ -38,7 +25,6 @@ def setup_server() -> FastAPI:
         None
     """
     configure_logging()  # Configure logging
-    load_configuration_file("configuration.yaml")
 
     set_application(
         Application(

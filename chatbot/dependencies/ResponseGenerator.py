@@ -58,7 +58,7 @@ class ResponseGenerator:
         """
         Generate a response based on the input.
 
-        This function takes a string as input and returns a string as a response.
+        This function takes a string as input and returns a string iterator as a response.
 
         Parameters:
             message (str): The input string.

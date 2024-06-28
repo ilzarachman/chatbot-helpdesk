@@ -1,15 +1,17 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, AsyncIterator
 
 from jinja2 import Template
 from pydantic import BaseModel
 
 from chatbot.Application import Application
-from chatbot.dependencies.IntentClassifier import Intent
+from chatbot.dependencies.InformationRetriever import InformationRetriever
+from chatbot.dependencies.IntentClassifier import Intent, IntentClassifier
 from chatbot.dependencies.PromptManager import PromptManager
 from chatbot.dependencies.contracts.message import Message, UserMessage
 
 # TODO: Implement response generator in each intent handlers
+
 
 class BaseIntentHandler(ABC):
     """
@@ -40,6 +42,16 @@ class BaseIntentHandler(ABC):
         """
         return self._application
 
+    @property
+    def information_retriever(self) -> InformationRetriever:
+        """
+        Gets the information retriever.
+
+        Returns:
+            InformationRetriever: The information retriever.
+        """
+        return self._application.information_retriever
+
     def with_app(self, application: Application) -> "BaseIntentHandler":
         """
         Sets the application instance.
@@ -63,7 +75,9 @@ class BaseIntentHandler(ABC):
         Returns:
             str: The prompt template.
         """
-        _prompt_template_no_context = PromptManager.get_prompt_template("response_generator", intent.name)
+        _prompt_template_no_context = PromptManager.get_prompt_template(
+            "response_generator", intent.name
+        )
         self._prompt_template = _prompt_template_no_context
         return self
 
@@ -79,8 +93,22 @@ class BaseIntentHandler(ABC):
         """
         return self._prompt_template.render(information=information)
 
+    def build_prompt(self, context: Optional[dict] = None) -> str:
+        """
+        Builds the prompt with context.
+
+        Parameters:
+            context (dict): The context.
+
+        Returns:
+            str: The prompt with context.
+        """
+        if context is None:
+            context = {}
+        return self._prompt_template.render(**context)
+
     @abstractmethod
-    async def handle(self, message: str) -> str:
+    async def handle(self, message: str) -> AsyncIterator[str]:
         """
         Handles the intent of the message.
 

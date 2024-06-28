@@ -28,16 +28,11 @@ class AcademicAdministrationIntentHandler(BaseIntentHandler):
         Returns:
             str: The response to the message.
         """
-        # 1. search for information in FAISS index
-        information = self.application.information_retriever.retrieve(
+        information = await self.information_retriever.retrieve_async(
             message, self._intent
         )
-        # 2. generate the prompt template
         prompt_template = self.build_prompt_with_information(information)
-        # 3. generate the response
         response_generator = ResponseGenerator.with_prompt_template(prompt_template)
         response = response_generator.response_async(message)
-
-        # TODO: Find a way to return iteratively like maybe using async generator
 
         return response

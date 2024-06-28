@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import StreamingResponse
 from ..Application import Application
 from ..app import get_application
 from ..dependencies.IntentClassifier import Intent
@@ -33,6 +34,4 @@ async def chat_prompt(chat_message: ChatMessage, app: Application = Depends(get_
     handler = IntentHandlerFactory.get_handler(intent)
     response = await handler.with_app(app).handle(message)
 
-    # TODO: This must be returned in streaming, so find a way to do it.
-
-    return {"response": response}
+    return StreamingResponse(response, media_type="text/plain")
