@@ -3,9 +3,31 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from chatbot.database import Base
-from chatbot.database.models.user import User
-
+import os
+import importlib
+from chatbot.dependencies.utils.path_utils import project_path
 from alembic import context
+
+
+def import_all_models(models_directory: str, model_namespace: str = "chatbot.database.models"):
+    model_files = [
+        filename[:-3]  # Remove the '.py' extension
+        for filename in os.listdir(models_directory)
+        if filename.endswith(".py") and filename != "__init__.py"
+    ]
+
+    for model_name in model_files:
+        module_path = f"{model_namespace}.{model_name}"
+        try:
+            model_module = importlib.import_module(module_path)
+            model_metadata = model_module.Base.metadata
+            print(f"Imported model: {model_name}")
+        except ImportError:
+            print(f"Error importing model: {model_name}")
+
+
+import_all_models(str(project_path("chatbot", "database", "models")))
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -66,9 +88,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
