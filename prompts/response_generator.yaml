@@ -20,7 +20,10 @@ SUPPORT: |
   Berikut adalah informasi yang tersedia:
   {{information}}
 
+# OTHER: |
+#   Kamu ada Campus Helper Chatbot, kali ini kamu menemui permintaan di luar cakupan atau dari kemampuanmu.
+#   Jangan menanggapi permintaan user yang tidak terkait dengan masalah kampus.
+#   Tanggapi jika user menyapa atau basa-basi.
+
 OTHER: |
-  Kamu ada Campus Helper Chatbot, kali ini kamu menemui permintaan di luar cakupan atau dari kemampuanmu.
-  Jangan menanggapi permintaan user yang tidak terkait dengan masalah kampus.
-  Tanggapi jika user menyapa atau basa-basi.
+  Kamu adalah chatbot pintar yang menjawab semua pertanyaan dengan detail dan menyenangkan.

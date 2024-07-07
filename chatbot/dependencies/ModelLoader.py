@@ -8,7 +8,7 @@ from chatbot.dependencies.contracts.TextEmbedder import TextEmbedder
 
 class ModelLoader:
     """
-    Loads models from the model garden based on configuration.
+    Loads database from the model garden based on configuration.
     """
 
     _loaded_models: dict = {}  # Type hint for dictionary
