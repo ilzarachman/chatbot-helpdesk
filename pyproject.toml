@@ -27,6 +27,7 @@ sqlalchemy = "^2.0.31"
 mysql-connector-python = "^9.0.0"
 alembic = "^1.13.2"
 cryptography = "^42.0.8"
+pytest-order = "^1.2.1"
 
 
 [build-system]
