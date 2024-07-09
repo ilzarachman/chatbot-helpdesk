@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from chatbot.database import SessionLocal
 from pydantic import BaseModel
 from chatbot.database.models.User import User as UserModel
 import hashlib
 import secrets
+
+from chatbot.http.Response import Response
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -19,8 +21,19 @@ class UserRequest(BaseModel):
     password: str
 
 
+class User(BaseModel):
+    """
+    Represents a user with student information.
+    """
+
+    id: int
+    student_number: str
+    name: str
+    email: str
+
+
 @router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_user(user: UserRequest):
+async def create_user(user: UserRequest) -> Response:
     """
     Creates a new user in the database.
 
@@ -28,7 +41,7 @@ async def create_user(user: UserRequest):
         user (UserRequest): User data including student number, name, email, and password.
 
     Returns:
-        dict: A message indicating successful user creation and the user details.
+        UserResponse: A message indicating successful user creation and the created user details.
     """
     db = SessionLocal()
     new_user = UserModel()
@@ -48,11 +61,20 @@ async def create_user(user: UserRequest):
     db.commit()
     db.refresh(new_user)
     db.close()
-    return {"message": "User created", "user": new_user}
+
+    return Response(
+        data=User(
+            id=new_user.id,
+            student_number=new_user.student_number,
+            name=new_user.name,
+            email=new_user.email,
+        ),
+        message="User created",
+    )
 
 
 @router.put("/update/{user_id}", status_code=status.HTTP_200_OK)
-async def update_user(user_id: int, user: UserRequest):
+async def update_user(user_id: int, user: UserRequest) -> Response:
     """
     Updates a user in the database.
 
@@ -81,13 +103,22 @@ async def update_user(user_id: int, user: UserRequest):
         db.commit()
         db.refresh(user_to_update)
         db.close()
-        return {"message": "User updated", "user": user_to_update}
+
+        return Response(
+            data=User(
+                id=user_to_update.id,
+                student_number=user_to_update.student_number,
+                name=user_to_update.name,
+                email=user_to_update.email,
+            ),
+            message="User updated",
+        )
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
 
 @router.delete("/delete/{user_id}", status_code=status.HTTP_200_OK)
-async def delete_user(user_id: int):
+async def delete_user(user_id: int) -> Response:
     """
     Deletes a user from the database.
 
@@ -104,13 +135,22 @@ async def delete_user(user_id: int):
         db.delete(user_to_delete)
         db.commit()
         db.close()
-        return {"message": f"User with ID:{user_id} deleted"}
+
+        return Response(
+            data=User(
+                id=user_to_delete.id,
+                student_number=user_to_delete.student_number,
+                name=user_to_delete.name,
+                email=user_to_delete.email,
+            ),
+            message=f"User with ID:{user_id} deleted",
+        )
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
 
 @router.get("/get/{user_id}", status_code=status.HTTP_200_OK)
-async def get_user(user_id: int):
+async def get_user(user_id: int) -> Response:
     """
     Retrieves a user from the database.
 
@@ -125,6 +165,80 @@ async def get_user(user_id: int):
     db.close()
 
     if user:
-        return {"message": "User retrieved", "user": user}
+        return Response(
+            data=User(
+                id=user.id,
+                student_number=user.student_number,
+                name=user.name,
+                email=user.email,
+            ),
+            message="User retrieved",
+        )
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+
+@router.get("/all", status_code=status.HTTP_200_OK)
+async def get_all_users() -> Response:
+    """
+    Retrieves all users from the database.
+
+    Returns:
+        dict: A message indicating successful user retrieval and the retrieved user details.
+    """
+    db = SessionLocal()
+    users = db.query(UserModel).all()
+    db.close()
+
+    _users = [
+        User(
+            id=user.id,
+            student_number=user.student_number,
+            name=user.name,
+            email=user.email,
+        )
+        for user in users
+    ]
+
+    if users:
+        return Response(data=_users, message="Users retrieved")
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Users not found")
+
+
+@router.get("/search", status_code=status.HTTP_200_OK)
+async def search_user(request: Request) -> Response:
+    """
+    Searches for a user in the database using a query string.
+
+    Returns:
+        dict: A message indicating successful user search and the retrieved user details.
+    """
+    query = request.query_params.get("query")
+
+    db = SessionLocal()
+    users = (
+        db.query(UserModel)
+        .filter(
+            UserModel.name.contains(query)
+            | UserModel.email.contains(query)
+            | UserModel.student_number.contains(query)
+        )
+        .all()
+    )
+    db.close()
+
+    _users = [
+        User(
+            id=user.id,
+            student_number=user.student_number,
+            name=user.name,
+            email=user.email,
+        )
+        for user in users
+    ]
+
+    if users:
+        return Response(data=_users, message="Users retrieved")
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Users not found")
