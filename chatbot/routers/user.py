@@ -6,6 +6,7 @@ import hashlib
 import secrets
 
 from chatbot.http.Response import Response
+from dependencies.utils.auth import protected
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -74,7 +75,7 @@ async def create_user(user: UserRequest) -> Response:
 
 
 @router.put("/update/{user_id}", status_code=status.HTTP_200_OK)
-async def update_user(user_id: int, user: UserRequest) -> Response:
+async def update_user(user_id: int, user: UserRequest, auth_user = Depends(protected)) -> Response:
     """
     Updates a user in the database.
 
@@ -118,7 +119,7 @@ async def update_user(user_id: int, user: UserRequest) -> Response:
 
 
 @router.delete("/delete/{user_id}", status_code=status.HTTP_200_OK)
-async def delete_user(user_id: int) -> Response:
+async def delete_user(user_id: int, auth_user = Depends(protected)) -> Response:
     """
     Deletes a user from the database.
 
@@ -150,7 +151,7 @@ async def delete_user(user_id: int) -> Response:
 
 
 @router.get("/get/{user_id}", status_code=status.HTTP_200_OK)
-async def get_user(user_id: int) -> Response:
+async def get_user(user_id: int, auth_user = Depends(protected)) -> Response:
     """
     Retrieves a user from the database.
 
@@ -179,7 +180,7 @@ async def get_user(user_id: int) -> Response:
 
 
 @router.get("/all", status_code=status.HTTP_200_OK)
-async def get_all_users() -> Response:
+async def get_all_users(auth_user = Depends(protected)) -> Response:
     """
     Retrieves all users from the database.
 
@@ -207,7 +208,7 @@ async def get_all_users() -> Response:
 
 
 @router.get("/search", status_code=status.HTTP_200_OK)
-async def search_user(request: Request) -> Response:
+async def search_user(request: Request, auth_user = Depends(protected)) -> Response:
     """
     Searches for a user in the database using a query string.
 

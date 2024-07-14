@@ -7,18 +7,24 @@ from chatbot.intent_handler import IntentHandlerFactory
 from ..logger import logger
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/chat", tags=["chat"])
+router = APIRouter(prefix="/chat", tags=["Chat"])
+# TODO: integrate the chat api endpoints with database.
+# - contexts_saving_method: we could do with creating contexts for each interation with user. we could generate the context on every user interaction using generative prompt templating.
+# - history_saving_method: or feeds all the message history to the chat model.
 
 
 class ChatMessage(BaseModel):
     """
     ChatMessage model.
     """
-    message: str
+
+    message: str = "This is a test message"
 
 
 @router.post("/prompt")
-async def chat_prompt(chat_message: ChatMessage, app: Application = Depends(get_application)):
+async def chat_prompt(
+    chat_message: ChatMessage, app: Application = Depends(get_application)
+):
     """
     Handles the "/prompt" GET request.
 

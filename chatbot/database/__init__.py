@@ -1,4 +1,5 @@
 from sqlalchemy import Column, DateTime, func
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -11,6 +12,7 @@ with open("alembic.ini") as config_file:
             db_url = line.split("=")[1].strip()
             break
 
+# engine = create_async_engine(db_url, pool_size=100, max_overflow=0)
 engine = create_engine(db_url)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
