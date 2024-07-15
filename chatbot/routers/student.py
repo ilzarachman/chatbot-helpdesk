@@ -1,17 +1,19 @@
+import os
+
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from chatbot.database import SessionLocal
 from pydantic import BaseModel
-from chatbot.database.models.User import User as UserModel
+from chatbot.database.models.Student import Student as UserModel
 import hashlib
 import secrets
 
 from chatbot.http.Response import Response
-from chatbot.dependencies.utils.auth import protected
+from chatbot.dependencies.utils.auth import protected_route, ACL
 
-router = APIRouter(prefix="/user", tags=["user"])
+router = APIRouter(prefix="/student", tags=["Student"])
 
 
-class UserRequest(BaseModel):
+class CreateStudentRequest(BaseModel):
     """
     Represents a user with student information.
     """
@@ -22,7 +24,7 @@ class UserRequest(BaseModel):
     password: str
 
 
-class User(BaseModel):
+class Student(BaseModel):
     """
     Represents a user with student information.
     """
@@ -34,12 +36,15 @@ class User(BaseModel):
 
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_user(user: UserRequest) -> Response:
+async def create_user(
+    user: CreateStudentRequest, auth_user=Depends(protected_route())
+) -> Response:
     """
     Creates a new user in the database.
 
     Args:
-        user (UserRequest): User data including student number, name, email, and password.
+        user (CreateStudentRequest): User data including student number, name, email, and password.
+        auth_user (User, optional): The authenticated user. Defaults to Depends(protected_route()).
 
     Returns:
         UserResponse: A message indicating successful user creation and the created user details.
@@ -64,7 +69,7 @@ async def create_user(user: UserRequest) -> Response:
     db.close()
 
     return Response(
-        data=User(
+        data=Student(
             id=new_user.id,
             student_number=new_user.student_number,
             name=new_user.name,
@@ -75,13 +80,16 @@ async def create_user(user: UserRequest) -> Response:
 
 
 @router.put("/update/{user_id}", status_code=status.HTTP_200_OK)
-async def update_user(user_id: int, user: UserRequest, auth_user = Depends(protected)) -> Response:
+async def update_user(
+    user_id: int, user: CreateStudentRequest, auth_user=Depends(protected_route())
+) -> Response:
     """
     Updates a user in the database.
 
     Args:
         user_id (int): The ID of the user to update.
-        user (UserRequest): User data including student number, name, email, and password.
+        user (CreateStudentRequest): User data including student number, name, email, and password.
+        auth_user (Depends(protected_route())): The authenticated user.
 
     Returns:
         dict: A message indicating successful user update and the updated user details.
@@ -106,7 +114,7 @@ async def update_user(user_id: int, user: UserRequest, auth_user = Depends(prote
         db.close()
 
         return Response(
-            data=User(
+            data=Student(
                 id=user_to_update.id,
                 student_number=user_to_update.student_number,
                 name=user_to_update.name,
@@ -119,7 +127,7 @@ async def update_user(user_id: int, user: UserRequest, auth_user = Depends(prote
 
 
 @router.delete("/delete/{user_id}", status_code=status.HTTP_200_OK)
-async def delete_user(user_id: int, auth_user = Depends(protected)) -> Response:
+async def delete_user(user_id: int, auth_user=Depends(protected_route())) -> Response:
     """
     Deletes a user from the database.
 
@@ -138,7 +146,7 @@ async def delete_user(user_id: int, auth_user = Depends(protected)) -> Response:
         db.close()
 
         return Response(
-            data=User(
+            data=Student(
                 id=user_to_delete.id,
                 student_number=user_to_delete.student_number,
                 name=user_to_delete.name,
@@ -151,7 +159,7 @@ async def delete_user(user_id: int, auth_user = Depends(protected)) -> Response:
 
 
 @router.get("/get/{user_id}", status_code=status.HTTP_200_OK)
-async def get_user(user_id: int, auth_user = Depends(protected)) -> Response:
+async def get_user(user_id: int, auth_user=Depends(protected_route())) -> Response:
     """
     Retrieves a user from the database.
 
@@ -167,7 +175,7 @@ async def get_user(user_id: int, auth_user = Depends(protected)) -> Response:
 
     if user:
         return Response(
-            data=User(
+            data=Student(
                 id=user.id,
                 student_number=user.student_number,
                 name=user.name,
@@ -180,7 +188,7 @@ async def get_user(user_id: int, auth_user = Depends(protected)) -> Response:
 
 
 @router.get("/all", status_code=status.HTTP_200_OK)
-async def get_all_users(auth_user = Depends(protected)) -> Response:
+async def get_all_users(auth_user=Depends(protected_route())) -> Response:
     """
     Retrieves all users from the database.
 
@@ -192,7 +200,7 @@ async def get_all_users(auth_user = Depends(protected)) -> Response:
     db.close()
 
     _users = [
-        User(
+        Student(
             id=user.id,
             student_number=user.student_number,
             name=user.name,
@@ -208,7 +216,9 @@ async def get_all_users(auth_user = Depends(protected)) -> Response:
 
 
 @router.get("/search", status_code=status.HTTP_200_OK)
-async def search_user(request: Request, auth_user = Depends(protected)) -> Response:
+async def search_user(
+    request: Request, auth_user=Depends(protected_route())
+) -> Response:
     """
     Searches for a user in the database using a query string.
 
@@ -230,7 +240,7 @@ async def search_user(request: Request, auth_user = Depends(protected)) -> Respo
     db.close()
 
     _users = [
-        User(
+        Student(
             id=user.id,
             student_number=user.student_number,
             name=user.name,

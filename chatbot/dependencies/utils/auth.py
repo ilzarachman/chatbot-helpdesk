@@ -1,8 +1,12 @@
+from enum import Enum
+
 from fastapi import Depends, HTTPException, status, Request, Response
 
-from chatbot.database.models.User import User as UserModel
+from chatbot.database.models.Student import Student as UserModel
+from chatbot.database.models.Staff import Staff as StaffModel
 from chatbot.database import SessionLocal
 from chatbot.dependencies.utils.SessionManagement import SessionManagement
+from dependencies.utils.SessionManagement import SessionDataType
 
 
 def get_token_from_cookie(request: Request) -> str | None:
@@ -23,33 +27,60 @@ def get_token_from_cookie(request: Request) -> str | None:
     )
 
 
-async def protected(token: str = Depends(get_token_from_cookie), response: Response = None):
+class ACL(Enum):
     """
-    Authenticates a user based on the provided session token.
-
-    Args:
-        token (str, optional): The session token. Defaults to Depends(get_token_from_cookie).
-        response (Response, optional): The response object. Defaults to None.
-
-    Raises:
-        HTTPException: If the user is not found or if the credentials are invalid.
-
-    Returns:
-        user: The authenticated user.
+    Enum representing the access levels of a user.
     """
-    data = SessionManagement.verify_session_token(token)
-    if data is None:
-        response.delete_cookie("session_token")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
-        )
 
-    db = SessionLocal()
-    user: UserModel = db.query(UserModel).get(data["user_id"])
+    STAFF = 0
+    USER = 1
 
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
-        )
 
-    return user
+def protected_route(access_level: ACL = ACL.STAFF):
+    async def protected(
+        token: str = Depends(get_token_from_cookie), response: Response = None
+    ) -> UserModel | StaffModel:
+        """
+        Authenticates a user based on the provided session token.
+
+        Args:
+            token (str, optional): The session token. Defaults to Depends(get_token_from_cookie).
+            response (Response, optional): The response object. Defaults to None.
+
+        Raises:
+            HTTPException: If the user is not found or if the credentials are invalid.
+
+        Returns:
+            user: The authenticated user.
+        """
+        data = SessionManagement.verify_session_token(token)
+        if data is None:
+            response.delete_cookie("session_token")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+            )
+
+        db = SessionLocal()
+
+        if data["type"] == SessionDataType.STAFF.value:
+            user: StaffModel = db.query(StaffModel).get(data["id"])
+        elif data["type"] == SessionDataType.USER.value:
+            user: UserModel = db.query(UserModel).get(data["id"])
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+            )
+
+        if user.access_level > access_level.value:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Access denied"
+            )
+
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+            )
+
+        return user
+
+    return protected

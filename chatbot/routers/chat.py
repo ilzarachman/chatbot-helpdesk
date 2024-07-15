@@ -6,8 +6,8 @@ from fastapi.responses import StreamingResponse
 
 from chatbot.database import SessionLocal
 from chatbot.database.models.Message import Message
-from chatbot.database.models.User import User
-from chatbot.dependencies.utils.auth import protected
+from chatbot.database.models.Student import Student
+from chatbot.dependencies.utils.auth import protected_route, ACL
 from chatbot.database.models.Conversation import Conversation
 from chatbot.http.Response import Response as ResponseTemplate
 from ..Application import Application
@@ -29,14 +29,13 @@ class ChatMessage(BaseModel):
     """
 
     message: str = "This is a test message"
-    conversation_id: int = 1
 
 
 @router.post("/prompt")
 async def chat_prompt(
     chat_message: ChatMessage,
     app: Application = Depends(get_application),
-    auth_user: User = Depends(protected),
+    auth_user: Student = Depends(protected_route(ACL.USER)),
 ):
     """
     Receives a prompt and returns the response.
@@ -44,7 +43,7 @@ async def chat_prompt(
     Args:
         chat_message (ChatMessage): The prompt message.
         app (Application, optional): The application. Defaults to Depends(get_application).
-        auth_user (User, optional): The authenticated user. Defaults to Depends(protected).
+        auth_user (User, optional): The authenticated user. Defaults to Depends(protected_route(ACL.USER)).
 
     Returns:
         dict: The response message.
@@ -74,14 +73,14 @@ class StoreChatRequest(BaseModel):
 @router.post("/chat/store", status_code=status.HTTP_201_CREATED)
 async def store_chat(
     store_chat_request: StoreChatRequest,
-    auth_user: User = Depends(protected),
+    auth_user: Student = Depends(protected_route(ACL.USER)),
 ):
     """
     Stores the chat history for the authenticated user.
 
     Args:
         store_chat_request (StoreChatRequest): The chat history.
-        auth_user (User, optional): The authenticated user. Defaults to Depends(protected).
+        auth_user (User, optional): The authenticated user. Defaults to Depends(protected_route(ACL.USER)).
 
     Returns:
         dict: A dictionary containing the conversation ID.
@@ -108,12 +107,12 @@ async def store_chat(
 
 
 @router.post("/conversation/new", status_code=status.HTTP_201_CREATED)
-async def create_conversation(auth_user: User = Depends(protected)):
+async def create_conversation(auth_user: Student = Depends(protected_route(ACL.USER))):
     """
     Creates a new conversation for the authenticated user.
 
     Args:
-        auth_user (User, optional): The authenticated user. Defaults to Depends(protected).
+        auth_user (User, optional): The authenticated user. Defaults to Depends(protected_route(ACL.USER)).
 
     Returns:
         dict: A dictionary containing the conversation ID.
@@ -133,12 +132,12 @@ async def create_conversation(auth_user: User = Depends(protected)):
 
 
 @router.get("/conversation/all")
-async def get_conversations(auth_user: User = Depends(protected)):
+async def get_conversations(auth_user: Student = Depends(protected_route(ACL.USER))):
     """
     Retrieves all conversations for the authenticated user.
 
     Args:
-        auth_user (User, optional): The authenticated user. Defaults to Depends(protected).
+        auth_user (User, optional): The authenticated user. Defaults to Depends(protected_route(ACL.USER)).
 
     Returns:
         dict: A dictionary containing the conversation ID.

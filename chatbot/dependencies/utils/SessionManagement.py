@@ -1,7 +1,21 @@
+import json
 import os
+from enum import Enum
 from typing import Any
 from itsdangerous import URLSafeTimedSerializer
+from pydantic import BaseModel
+
 from chatbot.logger import logger
+
+
+class SessionDataType(Enum):
+    USER = 1
+    STAFF = 0
+
+
+class SessionData(BaseModel):
+    id: int
+    type: SessionDataType
 
 
 class SessionManagement:
@@ -9,7 +23,7 @@ class SessionManagement:
     serializer = URLSafeTimedSerializer(secret_key)
 
     @classmethod
-    def create_session_token(cls, data: dict) -> str:
+    def create_session_token(cls, data: SessionData) -> str:
         """
         Creates a session token based on the input data.
 
@@ -19,7 +33,7 @@ class SessionManagement:
         Returns:
             str: The generated session token.
         """
-        return cls.serializer.dumps(data)
+        return cls.serializer.dumps(data.json())
 
     @classmethod
     def verify_session_token(cls, token: str) -> Any | None:
@@ -34,7 +48,7 @@ class SessionManagement:
         """
         try:
             data = cls.serializer.loads(token, max_age=15 * 24 * 60 * 60)
-            return data
+            return json.loads(data)
         except Exception as e:
             logger.error(e)
             return None
