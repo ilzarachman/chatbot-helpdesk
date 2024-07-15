@@ -33,7 +33,7 @@ class SessionManagement:
             Any | None: The deserialized data from the token, or None if verification fails.
         """
         try:
-            data = cls.serializer.loads(token, max_age=3600)
+            data = cls.serializer.loads(token, max_age=15 * 24 * 60 * 60)
             return data
         except Exception as e:
             logger.error(e)
