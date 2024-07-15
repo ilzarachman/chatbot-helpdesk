@@ -5,8 +5,8 @@ from chatbot.http.Response import Response as ResponseTemplate
 from pydantic import BaseModel
 from chatbot.database.models.User import User as UserModel
 from chatbot.database import SessionLocal
-from dependencies.utils.SessionManagement import SessionManagement
-from dependencies.utils.auth import protected
+from chatbot.dependencies.utils.SessionManagement import SessionManagement
+from chatbot.dependencies.utils.auth import protected
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

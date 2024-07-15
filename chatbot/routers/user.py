@@ -6,7 +6,7 @@ import hashlib
 import secrets
 
 from chatbot.http.Response import Response
-from dependencies.utils.auth import protected
+from chatbot.dependencies.utils.auth import protected
 
 router = APIRouter(prefix="/user", tags=["user"])
 
