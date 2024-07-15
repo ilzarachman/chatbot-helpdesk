@@ -11,6 +11,20 @@ from dependencies.utils.auth import protected
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
+@router.get("/", status_code=status.HTTP_200_OK)
+async def get_auth(auth: str = Depends(protected)):
+    """
+    Retrieves authentication information based on the provided auth token.
+
+    Parameters:
+    - auth (str, optional): The authentication token to validate.
+
+    Returns:
+    - bool: True if the authentication is successful, False otherwise.
+    """
+    return True
+
+
 class Credential(BaseModel):
     student_number: str
     password: str
@@ -76,7 +90,7 @@ async def login(credential: Credential, response: Response):
 
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
-async def logout(response: Response, auth_user = Depends(protected)):
+async def logout(response: Response, auth_user=Depends(protected)):
     """
     Logs out a user by removing the session token cookie.
 
@@ -87,6 +101,4 @@ async def logout(response: Response, auth_user = Depends(protected)):
         ResponseTemplate: A response indicating the success of the logout.
     """
     response.delete_cookie(key="session_token")
-    return ResponseTemplate(
-        message="Logout successful",
-    )
+    return {"message": "Logout successful"}

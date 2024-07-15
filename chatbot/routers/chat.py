@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
+
+from dependencies.utils.auth import protected
 from ..Application import Application
 from ..app import get_application
 from ..dependencies.IntentClassifier import Intent
@@ -23,7 +25,7 @@ class ChatMessage(BaseModel):
 
 @router.post("/prompt")
 async def chat_prompt(
-    chat_message: ChatMessage, app: Application = Depends(get_application)
+    chat_message: ChatMessage, app: Application = Depends(get_application), auth_user = Depends(protected)
 ):
     """
     Handles the "/prompt" GET request.

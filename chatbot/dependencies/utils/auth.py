@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status, Request
+from fastapi import Depends, HTTPException, status, Request, Response
 
 from chatbot.database import SessionLocal
 from chatbot.database.models.User import User as UserModel
@@ -23,12 +23,13 @@ def get_token_from_cookie(request: Request) -> str | None:
     )
 
 
-async def protected(token: str = Depends(get_token_from_cookie)):
+async def protected(token: str = Depends(get_token_from_cookie), response: Response = None):
     """
     Authenticates a user based on the provided session token.
 
     Args:
         token (str, optional): The session token. Defaults to Depends(get_token_from_cookie).
+        response (Response, optional): The response object. Defaults to None.
 
     Raises:
         HTTPException: If the user is not found or if the credentials are invalid.
@@ -38,6 +39,7 @@ async def protected(token: str = Depends(get_token_from_cookie)):
     """
     data = SessionManagement.verify_session_token(token)
     if data is None:
+        response.delete_cookie("session_token")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
