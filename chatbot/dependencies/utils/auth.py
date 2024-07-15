@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status, Request, Response
 
-from chatbot.database import SessionLocal
 from chatbot.database.models.User import User as UserModel
+from chatbot.database import SessionLocal
 from chatbot.dependencies.utils.SessionManagement import SessionManagement
 
 

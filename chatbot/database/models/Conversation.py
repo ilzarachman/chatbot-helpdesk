@@ -6,5 +6,6 @@ class Conversation(Base, TimeStampMixin):
     __tablename__ = "conversations"
 
     id = Column(Integer, primary_key=True)
+    name = Column(String(length=255), nullable=False)
     user_id = Column(Integer, nullable=False)
     start_time = Column(TIMESTAMP, nullable=False)
