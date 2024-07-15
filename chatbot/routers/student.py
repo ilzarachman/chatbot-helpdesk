@@ -49,24 +49,23 @@ async def create_user(
     Returns:
         UserResponse: A message indicating successful user creation and the created user details.
     """
-    db = SessionLocal()
-    new_user = UserModel()
+    with SessionLocal() as db:
+        new_user = UserModel()
 
-    # Generate a random salt
-    salt = secrets.token_hex(16)  # 16 bytes (128 bits) for a secure salt
-    salted_password = user.password + salt
-    hashed_password = hashlib.sha256(salted_password.encode()).hexdigest()
+        # Generate a random salt
+        salt = secrets.token_hex(16)  # 16 bytes (128 bits) for a secure salt
+        salted_password = user.password + salt
+        hashed_password = hashlib.sha256(salted_password.encode()).hexdigest()
 
-    new_user.student_number = user.student_number
-    new_user.name = user.name
-    new_user.email = user.email
-    new_user.password = hashed_password
-    new_user.salt = salt
+        new_user.student_number = user.student_number
+        new_user.name = user.name
+        new_user.email = user.email
+        new_user.password = hashed_password
+        new_user.salt = salt
 
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    db.close()
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
 
     return Response(
         data=Student(
@@ -94,24 +93,23 @@ async def update_user(
     Returns:
         dict: A message indicating successful user update and the updated user details.
     """
-    db = SessionLocal()
-    user_to_update = db.query(UserModel).filter(UserModel.id == user_id).first()
+    with SessionLocal() as db:
+        user_to_update = db.query(UserModel).filter(UserModel.id == user_id).first()
 
-    if user_to_update:
-        user_to_update.student_number = user.student_number
-        user_to_update.name = user.name
-        user_to_update.email = user.email
+        if user_to_update:
+            user_to_update.student_number = user.student_number
+            user_to_update.name = user.name
+            user_to_update.email = user.email
 
-        salt = secrets.token_hex(16)  # 16 bytes (128 bits) for a secure salt
-        salted_password = user.password + salt
-        hashed_password = hashlib.sha256(salted_password.encode()).hexdigest()
+            salt = secrets.token_hex(16)  # 16 bytes (128 bits) for a secure salt
+            salted_password = user.password + salt
+            hashed_password = hashlib.sha256(salted_password.encode()).hexdigest()
 
-        user_to_update.password = hashed_password
-        user_to_update.salt = salt
+            user_to_update.password = hashed_password
+            user_to_update.salt = salt
 
-        db.commit()
-        db.refresh(user_to_update)
-        db.close()
+            db.commit()
+            db.refresh(user_to_update)
 
         return Response(
             data=Student(
@@ -137,23 +135,22 @@ async def delete_user(user_id: int, auth_user=Depends(protected_route())) -> Res
     Returns:
         dict: A message indicating successful user deletion.
     """
-    db = SessionLocal()
-    user_to_delete = db.query(UserModel).filter(UserModel.id == user_id).first()
+    with SessionLocal() as db:
+        user_to_delete = db.query(UserModel).filter(UserModel.id == user_id).first()
 
-    if user_to_delete:
-        db.delete(user_to_delete)
-        db.commit()
-        db.close()
+        if user_to_delete:
+            db.delete(user_to_delete)
+            db.commit()
 
-        return Response(
-            data=Student(
-                id=user_to_delete.id,
-                student_number=user_to_delete.student_number,
-                name=user_to_delete.name,
-                email=user_to_delete.email,
-            ),
-            message=f"User with ID:{user_id} deleted",
-        )
+            return Response(
+                data=Student(
+                    id=user_to_delete.id,
+                    student_number=user_to_delete.student_number,
+                    name=user_to_delete.name,
+                    email=user_to_delete.email,
+                ),
+                message=f"User with ID:{user_id} deleted",
+            )
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
@@ -169,9 +166,8 @@ async def get_user(user_id: int, auth_user=Depends(protected_route())) -> Respon
     Returns:
         dict: A message indicating successful user retrieval and the retrieved user details.
     """
-    db = SessionLocal()
-    user = db.query(UserModel).filter(UserModel.id == user_id).first()
-    db.close()
+    with SessionLocal as db:
+        user = db.query(UserModel).filter(UserModel.id == user_id).first()
 
     if user:
         return Response(
@@ -195,19 +191,18 @@ async def get_all_users(auth_user=Depends(protected_route())) -> Response:
     Returns:
         dict: A message indicating successful user retrieval and the retrieved user details.
     """
-    db = SessionLocal()
-    users = db.query(UserModel).all()
-    db.close()
+    with SessionLocal() as db:
+        users = db.query(UserModel).all()
 
-    _users = [
-        Student(
-            id=user.id,
-            student_number=user.student_number,
-            name=user.name,
-            email=user.email,
-        )
-        for user in users
-    ]
+        _users = [
+            Student(
+                id=user.id,
+                student_number=user.student_number,
+                name=user.name,
+                email=user.email,
+            )
+            for user in users
+        ]
 
     if users:
         return Response(data=_users, message="Users retrieved")
@@ -227,27 +222,26 @@ async def search_user(
     """
     query = request.query_params.get("query")
 
-    db = SessionLocal()
-    users = (
-        db.query(UserModel)
-        .filter(
-            UserModel.name.contains(query)
-            | UserModel.email.contains(query)
-            | UserModel.student_number.contains(query)
+    with SessionLocal() as db:
+        users = (
+            db.query(UserModel)
+            .filter(
+                UserModel.name.contains(query)
+                | UserModel.email.contains(query)
+                | UserModel.student_number.contains(query)
+            )
+            .all()
         )
-        .all()
-    )
-    db.close()
 
-    _users = [
-        Student(
-            id=user.id,
-            student_number=user.student_number,
-            name=user.name,
-            email=user.email,
-        )
-        for user in users
-    ]
+        _users = [
+            Student(
+                id=user.id,
+                student_number=user.student_number,
+                name=user.name,
+                email=user.email,
+            )
+            for user in users
+        ]
 
     if users:
         return Response(data=_users, message="Users retrieved")

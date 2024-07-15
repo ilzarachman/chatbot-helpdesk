@@ -75,25 +75,25 @@ async def login(credential: StudentCredential, response: Response):
     student_number = credential.student_number
     password = credential.password
 
-    db = SessionLocal()
-    user = UserModel.get_user_by_student_number(db, student_number)
+    with SessionLocal() as db:
+        user = UserModel.get_user_by_student_number(db, student_number)
 
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+            )
+
+        if not compare_password(user.password, user.salt, password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+            )
+
+        # generate JWT token for session token
+        session_token = SessionManagement.create_session_token(
+            SessionData(id=user.id, type=SessionDataType.USER)
         )
 
-    if not compare_password(user.password, user.salt, password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
-        )
-
-    # generate JWT token for session token
-    session_token = SessionManagement.create_session_token(
-        SessionData(id=user.id, type=SessionDataType.USER)
-    )
-
-    response.set_cookie(key="session_token", value=session_token, httponly=True)
+        response.set_cookie(key="session_token", value=session_token, httponly=True)
 
     return ResponseTemplate(
         message="Login successful",
@@ -120,23 +120,24 @@ async def staff_login(credential: StaffCredential, response: Response):
     password = credential.password
 
     db = SessionLocal()
-    user = StaffModel.get_user_by_staff_number(db, staff_number)
+    with db:
+        user = StaffModel.get_user_by_staff_number(db, staff_number)
 
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+            )
+
+        if not compare_password(user.password, user.salt, password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+            )
+
+        session_token = SessionManagement.create_session_token(
+            SessionData(id=user.id, type=SessionDataType.STAFF)
         )
 
-    if not compare_password(user.password, user.salt, password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
-        )
-
-    session_token = SessionManagement.create_session_token(
-        SessionData(id=user.id, type=SessionDataType.STAFF)
-    )
-
-    response.set_cookie(key="session_token", value=session_token, httponly=True)
+        response.set_cookie(key="session_token", value=session_token, httponly=True)
 
     return ResponseTemplate(
         message="Login successful",

@@ -60,26 +60,25 @@ def protected_route(access_level: ACL = ACL.STAFF):
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
             )
 
-        db = SessionLocal()
+        with SessionLocal() as db:
+            if data["type"] == SessionDataType.STAFF.value:
+                user: StaffModel = db.query(StaffModel).get(data["id"])
+            elif data["type"] == SessionDataType.USER.value:
+                user: UserModel = db.query(UserModel).get(data["id"])
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+                )
 
-        if data["type"] == SessionDataType.STAFF.value:
-            user: StaffModel = db.query(StaffModel).get(data["id"])
-        elif data["type"] == SessionDataType.USER.value:
-            user: UserModel = db.query(UserModel).get(data["id"])
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
-            )
+            if user.access_level > access_level.value:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED, detail="Access denied"
+                )
 
-        if user.access_level > access_level.value:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Access denied"
-            )
-
-        if user is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
-            )
+            if user is None:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+                )
 
         return user
 

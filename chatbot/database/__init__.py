@@ -13,7 +13,13 @@ with open("alembic.ini") as config_file:
             break
 
 # engine = create_async_engine(db_url, pool_size=100, max_overflow=0)
-engine = create_engine(db_url)
+engine = create_engine(
+    db_url,
+    pool_size=10,  # Increase pool size
+    max_overflow=20,  # Increase overflow limit
+    pool_timeout=30,  # Adjust timeout as needed
+)
+
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
