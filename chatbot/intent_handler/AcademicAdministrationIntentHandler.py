@@ -16,7 +16,7 @@ class AcademicAdministrationIntentHandler(BaseIntentHandler):
         super().__init__()
         self.with_prompt_template(self._intent)
 
-    async def handle(self, message: str) -> AsyncIterator[str]:
+    async def handle(self, message: str, conversation_id: int | None = None) -> AsyncIterator[str]:
         """
         Handles the intent of the message.
 
@@ -24,6 +24,7 @@ class AcademicAdministrationIntentHandler(BaseIntentHandler):
 
         Parameters:
             message (str): The message to be handled.
+            conversation_id (int): The conversation ID.
 
         Returns:
             str: The response to the message.

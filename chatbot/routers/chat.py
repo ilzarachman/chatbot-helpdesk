@@ -22,9 +22,6 @@ from ..logger import logger
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
-# TODO: integrate the chat api endpoints with database.
-# - contexts_saving_method: we could do with creating contexts for each interation with user. we could generate the context on every user interaction using generative prompt templating.
-# - history_saving_method: or feeds all the message history to the chat model.
 
 
 class ChatMessage(BaseModel):
@@ -33,6 +30,7 @@ class ChatMessage(BaseModel):
     """
 
     message: str = "This is a test message"
+    conversation_uuid: str
 
 
 @router.post("/prompt")
@@ -56,8 +54,19 @@ async def chat_prompt(
     message: str = chat_message.message
     intent: Intent = await app.intent_classifier.classify(message)
 
+    _conv_id = None
+
+    if chat_message.conversation_uuid != "":
+        with SessionLocal() as db:
+            conversation = db.query(Conversation).filter(Conversation.uuid == chat_message.conversation_uuid).first()
+
+            if not conversation:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
+
+            _conv_id = conversation.id
+
     handler = IntentHandlerFactory.get_handler(intent)
-    response = await handler.with_app(app).handle(message)
+    response = await handler.with_app(app).handle(message, _conv_id)
 
     logger.debug(f"Response: {response}")
 
