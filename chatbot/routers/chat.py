@@ -50,11 +50,8 @@ async def chat_prompt(
     Returns:
         dict: The response message.
     """
-    logger.debug(f"Received message: {chat_message.message}")
-    message: str = chat_message.message
-    intent: Intent = await app.intent_classifier.classify(message)
-
     _conv_id = None
+    history: list[dict] = []
 
     if chat_message.conversation_uuid != "":
         with SessionLocal() as db:
@@ -65,8 +62,26 @@ async def chat_prompt(
 
             _conv_id = conversation.id
 
+            if _conv_id is not None:
+                messages = (
+                    db.query(Message)
+                    .filter_by(conversation_id=_conv_id)
+                    .order_by(Message.created_at.desc())
+                    .limit(2)
+                    .all()
+                )
+
+                for msg in messages:
+                    history.append(json.loads(msg.text))
+
+    logger.debug(f"Received message: {chat_message.message}")
+    message: str = chat_message.message
+    intent: Intent = await app.intent_classifier.classify_with_history(message, history)
+
+    logger.info(f"get intent: {intent.value}")
+
     handler = IntentHandlerFactory.get_handler(intent)
-    response = await handler.with_app(app).handle(message, _conv_id)
+    response = await handler.with_app(app).handle(message, history=history)
 
     logger.debug(f"Response: {response}")
 
@@ -80,7 +95,7 @@ class StoreChatRequest(BaseModel):
 
     user_message: str
     assistant_message: str
-    conversation_id: int
+    conversation_uuid: str
 
 
 @router.post("/store", status_code=status.HTTP_201_CREATED)
@@ -99,20 +114,34 @@ async def store_chat(
         dict: A dictionary containing the conversation ID.
     """
     with SessionLocal() as db:
+        conversation = (
+            db.query(Conversation)
+            .filter_by(uuid=store_chat_request.conversation_uuid, user_id=auth_user.id)
+            .first()
+        )
+
+        if not conversation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Conversation not found",
+            )
+
         message = Message()
         text_json = {
             "U": store_chat_request.user_message,
             "A": store_chat_request.assistant_message,
         }
 
-        message.conversation_id = store_chat_request.conversation_id
+        message.conversation_id = conversation.id
         message.text = json.dumps(text_json)
 
         db.add(message)
         db.commit()
 
     return ResponseTemplate(
-        data=store_chat_request.conversation_id,
+        data={
+            "conversation_uuid": store_chat_request.conversation_uuid,
+        },
         message="Chat stored successfully",
     )
 
@@ -182,6 +211,7 @@ async def get_conversations(
         conversations = (
             db.query(Conversation)
             .filter_by(user_id=auth_user.id, user_type=user_type)
+            .order_by(Conversation.start_time.desc())
             .all()
         )
 

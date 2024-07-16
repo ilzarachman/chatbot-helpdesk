@@ -107,7 +107,7 @@ class BaseIntentHandler(ABC):
         return self._prompt_template.render(**context)
 
     @abstractmethod
-    async def handle(self, message: str, conversation_id: int | None = None) -> AsyncIterator[str]:
+    async def handle(self, message: str, history: list[dict] | None = None) -> AsyncIterator[str]:
         """
         Handles the intent of the message.
 
@@ -115,7 +115,7 @@ class BaseIntentHandler(ABC):
 
         Parameters:
             message (str): The message to be handled.
-            conversation_id (int): The conversation ID.
+            history (List[dict]): The history list.
 
         Returns:
             str: The response to the message.

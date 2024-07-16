@@ -96,7 +96,6 @@ class ResponseGenerator:
         Yields:
             str: The response string.
         """
-        print(message)
         prompts: list[Message] = self._build_history_messages(message, history)
 
         logger.debug(f"Prompts: {[str(prompt) for prompt in prompts]} ")
