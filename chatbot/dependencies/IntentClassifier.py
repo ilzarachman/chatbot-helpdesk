@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional
 from chatbot.config import Configuration
 from chatbot.dependencies.ModelLoader import ModelLoader
@@ -156,6 +157,13 @@ class IntentClassifier:
         intent_str = await self._model.generate_async(
             prompts, self._intent_classifier_config.get("model_settings")
         )
+
+        try:
+            loop = asyncio.get_running_loop()
+            if loop:
+                print(f"Active event loop: {loop}")
+        except RuntimeError:  # Handles case where no loop is running
+            print("No active event loop found")
 
         return Intent(intent_str)
 

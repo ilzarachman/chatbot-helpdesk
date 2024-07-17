@@ -78,9 +78,19 @@ async def create_user(
     )
 
 
+class UpdateStudentRequest(BaseModel):
+    """
+    Represents a user with student information.
+    """
+
+    student_number: str | None = None
+    name: str | None = None
+    email: str | None = None
+
+
 @router.put("/update/{user_id}", status_code=status.HTTP_200_OK)
 async def update_user(
-    user_id: int, user: CreateStudentRequest, auth_user=Depends(protected_route())
+    user_id: int, user: UpdateStudentRequest, auth_user=Depends(protected_route())
 ) -> Response:
     """
     Updates a user in the database.
@@ -97,16 +107,13 @@ async def update_user(
         user_to_update = db.query(UserModel).filter(UserModel.id == user_id).first()
 
         if user_to_update:
-            user_to_update.student_number = user.student_number
-            user_to_update.name = user.name
-            user_to_update.email = user.email
-
-            salt = secrets.token_hex(16)  # 16 bytes (128 bits) for a secure salt
-            salted_password = user.password + salt
-            hashed_password = hashlib.sha256(salted_password.encode()).hexdigest()
-
-            user_to_update.password = hashed_password
-            user_to_update.salt = salt
+            user_to_update.student_number = (
+                user.student_number
+                if user.student_number
+                else user_to_update.student_number
+            )
+            user_to_update.name = user.name if user.name else user_to_update.name
+            user_to_update.email = user.email if user.email else user_to_update.email
 
             db.commit()
             db.refresh(user_to_update)
@@ -166,7 +173,7 @@ async def get_user(user_id: int, auth_user=Depends(protected_route())) -> Respon
     Returns:
         dict: A message indicating successful user retrieval and the retrieved user details.
     """
-    with SessionLocal as db:
+    with SessionLocal() as db:
         user = db.query(UserModel).filter(UserModel.id == user_id).first()
 
     if user:

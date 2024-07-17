@@ -3,7 +3,7 @@ from typing import AsyncIterator
 
 from sqlalchemy import func
 
-from logger import logger
+from chatbot.logger import logger
 from chatbot.dependencies.IntentClassifier import Intent
 from chatbot.dependencies.ResponseGenerator import ResponseGenerator
 from chatbot.dependencies.contracts.BaseIntentHandler import BaseIntentHandler

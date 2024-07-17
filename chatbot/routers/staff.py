@@ -9,7 +9,7 @@ import secrets
 
 from chatbot.http.Response import Response as ResponseTemplate
 from chatbot.dependencies.utils.auth import protected_route, ACL
-from logger import logger
+from chatbot.logger import logger
 
 router = APIRouter(prefix="/staff", tags=["Staff"])
 

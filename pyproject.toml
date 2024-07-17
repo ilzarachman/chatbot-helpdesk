@@ -30,6 +30,7 @@ cryptography = "^42.0.8"
 pytest-order = "^1.2.1"
 itsdangerous = "^2.2.0"
 passlib = "^1.7.4"
+faker = "^26.0.0"
 
 
 [build-system]

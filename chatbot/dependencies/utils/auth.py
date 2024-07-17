@@ -6,7 +6,7 @@ from chatbot.database.models.Student import Student as UserModel
 from chatbot.database.models.Staff import Staff as StaffModel
 from chatbot.database import SessionLocal
 from chatbot.dependencies.utils.SessionManagement import SessionManagement
-from dependencies.utils.SessionManagement import SessionDataType
+from chatbot.dependencies.utils.SessionManagement import SessionDataType
 
 
 def get_token_from_cookie(request: Request) -> str | None:
