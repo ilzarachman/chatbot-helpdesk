@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 
-from chatbot.config import Configuration
 from chatbot.logger import configure_logging, logger
 from fastapi import FastAPI
 from chatbot.routers import router
@@ -10,7 +9,7 @@ from chatbot.Application import Application
 from chatbot.dependencies.DocumentEmbedder import DocumentEmbedder
 from chatbot.dependencies.InformationRetriever import InformationRetriever
 from chatbot.dependencies.IntentClassifier import IntentClassifier
-from chatbot.dependencies.ResponseGenerator import ResponseGenerator
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv(override=True)
 
@@ -34,6 +33,19 @@ def setup_server() -> FastAPI:
         )
     )
     server = FastAPI()
+
+    origins = [
+        "http://localhost:3000"
+    ]
+
+    server.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"]
+    )
+
     server.include_router(router)
 
     return server

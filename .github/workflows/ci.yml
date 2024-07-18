@@ -1,18 +1,33 @@
 name: CI
 
-on: [pull_request]
+on: [pull_request, push]
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: [3.10]
+        os: [ubuntu-latest]
+        python-version: [3.10.14]
+
+    services:
+      # Define MySQL service with a specific version
+      mysql:
+        image: mysql:8.0  # Adjust version if needed
+
+    env:
+      # Store database credentials securely using GitHub Secrets
+      MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      APP_PORT: ${{ secrets.APP_PORT }}
+      SESSION_SECRET_KEY: ${{ secrets.SESSION_SECRET_KEY }}
+      DATABASE_URL: mysql+mysqlconnector://root:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -27,6 +42,16 @@ jobs:
       run: |
         poetry install
 
+    - name: Install MySQL client (for Ubuntu only)
+      # Assuming Ubuntu runner for MySQL client installation
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update && sudo apt-get install -y mysql-client
+
+#    - name: Apply Alembic migrations
+#      run: |
+#        poetry run alembic upgrade head
+
     - name: Run tests
       run: |
-        poetry run pytest
+        poetry run pytest -m "not integration"

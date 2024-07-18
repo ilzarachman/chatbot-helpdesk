@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, AsyncIterator
+from typing import Optional, AsyncIterator, List
 
 from jinja2 import Template
 from pydantic import BaseModel
@@ -19,6 +19,7 @@ class BaseIntentHandler(ABC):
     def __init__(self):
         self._application: Optional[Application] = None
         self._prompt_template: Optional[Template] = None
+        self._history: Optional[List[Message]] = None
 
     @property
     def prompt_template(self) -> Template:
@@ -106,7 +107,7 @@ class BaseIntentHandler(ABC):
         return self._prompt_template.render(**context)
 
     @abstractmethod
-    async def handle(self, message: str) -> AsyncIterator[str]:
+    async def handle(self, message: str, history: list[dict] | None = None) -> AsyncIterator[str]:
         """
         Handles the intent of the message.
 
@@ -114,6 +115,7 @@ class BaseIntentHandler(ABC):
 
         Parameters:
             message (str): The message to be handled.
+            history (List[dict]): The history list.
 
         Returns:
             str: The response to the message.

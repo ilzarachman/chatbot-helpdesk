@@ -19,6 +19,9 @@ response_generator:
   model_settings:
     temperature: 0
 
+title_generator:
+  model: gemini
+
 model_garden:
   gemini:
     name: Gemini

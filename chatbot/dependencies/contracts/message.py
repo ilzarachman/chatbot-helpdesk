@@ -22,6 +22,16 @@ class Message(ABC):
         """
         pass
 
+    @abstractmethod
+    def __str__(self):
+        """
+        Returns a string representation of the message.
+
+        Returns:
+            str: The string representation of the message.
+        """
+        return f"Message({self.message})"
+
 
 class AssistantMessage(Message):
 
@@ -41,7 +51,7 @@ class AssistantMessage(Message):
         Returns:
             str: The string representation of the message.
         """
-        return self.message
+        return f"Assistant({self.message})"
 
 
 class UserMessage(Message):
@@ -62,7 +72,7 @@ class UserMessage(Message):
         Returns:
             str: The string representation of the message.
         """
-        return self.message
+        return f"User({self.message})"
 
 
 class SystemMessage(Message):
@@ -83,4 +93,4 @@ class SystemMessage(Message):
         Returns:
             str: The string representation of the message.
         """
-        return self.message
+        return f"System({self.message})"

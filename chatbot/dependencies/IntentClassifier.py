@@ -1,9 +1,15 @@
+import asyncio
 from typing import Optional
 from chatbot.config import Configuration
 from chatbot.dependencies.ModelLoader import ModelLoader
 from chatbot.dependencies.PromptManager import PromptManager
 from chatbot.dependencies.contracts.TextGenerator import TextGenerator
-from chatbot.dependencies.contracts.message import Message, SystemMessage, UserMessage
+from chatbot.dependencies.contracts.message import (
+    Message,
+    SystemMessage,
+    UserMessage,
+    AssistantMessage,
+)
 from chatbot.dependencies.utils.StringEnum import StringEnum
 
 
@@ -147,6 +153,54 @@ class IntentClassifier:
             str: The intent of the message.
         """
         prompts: list[Message] = self._build_prompt_with_examples(message)
+
+        intent_str = await self._model.generate_async(
+            prompts, self._intent_classifier_config.get("model_settings")
+        )
+
+        try:
+            loop = asyncio.get_running_loop()
+            if loop:
+                print(f"Active event loop: {loop}")
+        except RuntimeError:  # Handles case where no loop is running
+            print("No active event loop found")
+
+        return Intent(intent_str)
+
+    def _build_history_messages(
+        self, message: str, history: list[dict]
+    ) -> list[Message]:
+        """
+        Helper method to build the history messages.
+
+        Parameters:
+            message (str): The message to be classified.
+            history (list[dict]): The history list.
+
+        Returns:
+            list[Message]: The list of messages.
+        """
+        prompts: list[Message] = [SystemMessage(self._prompt_template)]
+
+        for msg in history:
+            prompts.append(UserMessage(msg["A"]))
+        prompts.append(UserMessage(message))
+
+        return prompts
+
+    async def classify_with_history(self, message: str, history: list[dict]) -> Intent:
+        """Classify the intent of the given message with history.
+
+        This function takes a message and a history as input and returns the intent of the message as a string.
+
+        Parameters:
+            message (str): The message to be classified.
+            history (list[dict]): The history list.
+
+        Returns:
+            str: The intent of the message.
+        """
+        prompts: list[Message] = self._build_history_messages(message, history)
 
         intent_str = await self._model.generate_async(
             prompts, self._intent_classifier_config.get("model_settings")

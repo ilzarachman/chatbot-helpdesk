@@ -10,9 +10,6 @@ import sys
 
 from chatbot.logger import logger, configure_logging
 
-if sys.platform == "win32":
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
 load_dotenv(override=True)
 Configuration(path="configuration.yaml")
 configure_logging()
