@@ -75,7 +75,7 @@ async def chat_prompt(
                 messages = (
                     db.query(Message)
                     .filter_by(conversation_id=_conv_id)
-                    .order_by(Message.created_at.desc())
+                    .order_by(Message.created_at.asc())
                     .limit(2)
                     .all()
                 )
@@ -83,7 +83,6 @@ async def chat_prompt(
                 for msg in messages:
                     history.append(json.loads(msg.text))
 
-    logger.debug(f"Received message: {chat_message.message}")
     message: str = chat_message.message
     intent: Intent = await app.intent_classifier.classify_with_history(message, history)
 
