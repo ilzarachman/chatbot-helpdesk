@@ -19,6 +19,10 @@ jobs:
       # Store database credentials securely using GitHub Secrets
       MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
       MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      APP_PORT: ${{ secrets.APP_PORT }}
+      SESSION_SECRET_KEY: ${{ secrets.SESSION_SECRET_KEY }}
       DATABASE_URL: mysql+mysqlconnector://root:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}
 
     steps:
