@@ -44,9 +44,9 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y mysql-client
 
-    - name: Apply Alembic migrations
-      run: |
-        poetry run alembic upgrade head
+#    - name: Apply Alembic migrations
+#      run: |
+#        poetry run alembic upgrade head
 
     - name: Run tests
       run: |
