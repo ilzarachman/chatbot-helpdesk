@@ -53,6 +53,8 @@ async def chat_prompt(
     _conv_id = None
     history: list[dict] = []
 
+    logger.debug(f"Received message: {chat_message.message}, conversation_uuid: {chat_message.conversation_uuid}")
+
     if chat_message.conversation_uuid != "":
         with SessionLocal() as db:
             conversation = (
