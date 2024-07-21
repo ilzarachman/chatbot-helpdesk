@@ -19,6 +19,7 @@ class DocumentEmbedder:
     _supported_document_types: dict[str, type(BaseLoader)] = {
         "txt": document_loaders.TextLoader,
         "pdf": document_loaders.PyPDFLoader,
+        "docx": document_loaders.Docx2txtLoader,
     }
     """
     Supported document types.
@@ -26,6 +27,7 @@ class DocumentEmbedder:
     Supported document types are:
     - txt
     - pdf
+    - docx
     """
 
     def __init__(self):
@@ -56,6 +58,27 @@ class DocumentEmbedder:
             raw_doc = self._load_document(doc_path)
             documents = self._split_raw_document(raw_doc)
             self._save_to_faiss_index(documents, doc_category)
+        except Exception as e:
+            raise RuntimeError(f"Error saving document to vectorstore: {e}")
+
+    def save_public_document_to_vectorstore(self, doc_path: str, doc_category: Intent) -> None:
+        """
+        Saves a public document to the vectorstorage.
+
+        Args:
+            doc_path (str): The path to the document.
+            doc_category (Intent): The type of the document.
+
+        Returns:
+            None
+
+        Raises:
+            RuntimeError: document can't be saved.
+        """
+        try:
+            raw_doc = self._load_document(doc_path)
+            documents = self._split_raw_document(raw_doc)
+            self._save_public_to_faiss_index(documents, doc_category)
         except Exception as e:
             raise RuntimeError(f"Error saving document to vectorstore: {e}")
 
@@ -120,6 +143,25 @@ class DocumentEmbedder:
         """
         faiss_root_dir = project_path("faiss")
         faiss_category_dir = faiss_root_dir / category.value
+
+        if not faiss_category_dir.exists():
+            self._embedding_model.save_to_faiss_index(documents, faiss_category_dir)
+            return
+
+        self._embedding_model.add_data_to_faiss_index(documents, faiss_category_dir)
+
+    def _save_public_to_faiss_index(self, documents: list[Document], category: Intent) -> None:
+        """
+        Saves a public document to the FAISS index.
+
+        Args:
+            documents (list[Document]): The document to be saved.
+
+        Returns:
+            None
+        """
+        faiss_root_dir = project_path("faiss")
+        faiss_category_dir = faiss_root_dir / (category.value + "_public")
 
         if not faiss_category_dir.exists():
             self._embedding_model.save_to_faiss_index(documents, faiss_category_dir)

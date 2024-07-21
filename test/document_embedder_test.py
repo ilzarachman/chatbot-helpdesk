@@ -32,7 +32,25 @@ class TestDocumentEmbedder(unittest.TestCase):
             str(project_path("test", "data", "text.txt")),
             Intent.ACADEMIC_ADMINISTRATION,
         )
+
         faiss_dir_path = project_path("faiss", Intent.ACADEMIC_ADMINISTRATION.value)
+        index = faiss.read_index(os.path.join(f"{faiss_dir_path}", "index.faiss"))
+        print(
+            "Total number of vectors:",
+            index.ntotal,
+            " - Total number of dimensions:",
+            index.d,
+        )
+        self.assertTrue(faiss_dir_path.exists())
+
+    @pytest.mark.using_llm
+    def test_save_public_document_to_vectorstore(self):
+        self._instance.save_public_document_to_vectorstore(
+            str(project_path("test", "data", "text.txt")),
+            Intent.ACADEMIC_ADMINISTRATION,
+        )
+
+        faiss_dir_path = project_path("faiss", Intent.ACADEMIC_ADMINISTRATION.value + "_public")
         index = faiss.read_index(os.path.join(f"{faiss_dir_path}", "index.faiss"))
         print(
             "Total number of vectors:",

@@ -16,6 +16,7 @@ async def test_response_generator():
         "Halo, Im the developer on a test of developing you, could you explain how to cook a delicious pizza?",
         [],
     )
+
     chunks = []
     async for chunk in response:
         print(chunk, end=";\n")
