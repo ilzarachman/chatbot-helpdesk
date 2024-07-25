@@ -1,8 +1,8 @@
-"""change text into Text column
+"""all revisions
 
-Revision ID: 7626c8981695
-Revises: 994762c3c8fb
-Create Date: 2024-07-16 00:40:21.090377
+Revision ID: 5803f0c662a7
+Revises: 
+Create Date: 2024-07-25 14:54:29.657171
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '7626c8981695'
-down_revision: Union[str, None] = '994762c3c8fb'
+revision: str = '5803f0c662a7'
+down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -32,10 +32,22 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('uuid')
     )
+    op.create_table('documents',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('uuid', sa.String(length=255), nullable=False),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('uploader_id', sa.Integer(), nullable=False),
+    sa.Column('embedded', sa.Boolean(), nullable=False),
+    sa.Column('intent', sa.String(length=255), nullable=False),
+    sa.Column('public', sa.Boolean(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('uuid')
+    )
     op.create_table('messages',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('conversation_id', sa.Integer(), nullable=False),
-    sa.Column('message_type', sa.Enum('user', 'assistant', 'system'), nullable=False),
     sa.Column('text', sa.Text(length=4294000000), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
@@ -77,5 +89,6 @@ def downgrade() -> None:
     op.drop_table('students')
     op.drop_table('staffs')
     op.drop_table('messages')
+    op.drop_table('documents')
     op.drop_table('conversations')
     # ### end Alembic commands ###
