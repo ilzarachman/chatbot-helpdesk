@@ -15,21 +15,33 @@ This project is a chatbot designed to provide helpdesk support. It is built usin
 
 1. **Prerequisites:**
    - Python 3.10
-   - Poetry
+   - [Poetry](https://python-poetry.org/docs/#installation)
    - OpenAI API Key (You can get it from https://platform.openai.com/account/api-keys)
    - Gemini API Key (You can get it from https://aistudio.google.com/app/apikey)
 
 2. **Steps:**
-   - Clone the repository: `git clone https://github.com/your-username/chatbot-helpdesk.git`
-   - Navigate to the project directory: `cd chatbot-helpdes`
+   - Clone the repository: 
+     ```shell
+     git clone https://github.com/ilzarachman/chatbot-helpdesk.git
+     ```
+   - Navigate to the project directory: `cd chatbot-helpdesk`
    - Create a Poetry virtual environment: `poetry install`
-   - Run the server: `poetry run python chatbot/main.py`
+   - Run the server:
+      - There are two ways to run the server, either you can set the environment variables manually using `export` or you can use third party tools like [Infisical](https://infisical.com/).
+      - Then you can run the server using 
+     ```shell
+     poetry run python chatbot/main.py
+     ```
+      - If you are using Infisical, you can run it using `infisical run -- poetry run python chatbot/main.py`
+     ```shell
+     infisical run -- poetry run python chatbot/main.py
+     ```
 
 3. **Testing:**
    
     Run the tests using `pytest` or you can run 
     ```shell
-    poetry run python test.py all
+    poetry run python test.py unit
     ```
 
 ## Contributing
@@ -45,9 +57,10 @@ Contributions are welcome! Please follow these steps:
 ## Development Logs
 - [x] Implementasi OOP dengan FastAPI Backend untuk mempermudah proses development.
 - [x] Unit testing dan integration testing.
-- [ ] Database management.
-- [ ] Frontend development.
-  - [ ] Implementasi UI.
+- [x] Database management.
+- [x] Frontend development.
+  - [x] Implementasi UI.
+- [ ] Implementasi Sistem Admin staff untuk mengelola data document.
 - [ ] Deployment.
 
 ## License

@@ -1,15 +1,8 @@
 from dotenv import load_dotenv
 
+import os
 from chatbot.logger import configure_logging, logger
 from fastapi import FastAPI
-from chatbot.routers import router
-from chatbot.app import set_application
-import os
-from chatbot.Application import Application
-from chatbot.dependencies.DocumentEmbedder import DocumentEmbedder
-from chatbot.dependencies.InformationRetriever import InformationRetriever
-from chatbot.dependencies.IntentClassifier import IntentClassifier
-from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv(override=True)
 
@@ -23,6 +16,14 @@ def setup_server() -> FastAPI:
     Raises:
         None
     """
+    from chatbot.routers import router
+    from chatbot.app import set_application
+    from chatbot.Application import Application
+    from chatbot.dependencies.DocumentEmbedder import DocumentEmbedder
+    from chatbot.dependencies.InformationRetriever import InformationRetriever
+    from chatbot.dependencies.IntentClassifier import IntentClassifier
+    from fastapi.middleware.cors import CORSMiddleware
+
     configure_logging()  # Configure logging
 
     set_application(
@@ -34,16 +35,14 @@ def setup_server() -> FastAPI:
     )
     server = FastAPI()
 
-    origins = [
-        "http://localhost:3000"
-    ]
+    origins = ["http://localhost:3000"]
 
     server.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
-        allow_headers=["*"]
+        allow_headers=["*"],
     )
 
     server.include_router(router)
@@ -70,6 +69,28 @@ def run_app(server: FastAPI):
         pass
 
 
+def check_environment_variables():
+    """
+    Checks if all required environment variables are set.
+
+    :return: None
+    :rtype: None
+    """
+    required_vars = []
+
+    # load file .example-env
+    with open(".example-env", "r") as f:
+        for line in f:
+            if line.startswith("#") or line.isspace():
+                continue
+            var, value = line.strip().split("=")
+            required_vars.append(var)
+
+    for var in required_vars:
+        if not os.getenv(var):
+            raise ValueError(f"Environment variable {var} is not set.")
+
+
 def main():
     """
     Initializes the main function of the program.
@@ -84,6 +105,7 @@ def main():
     Returns:
         None
     """
+    check_environment_variables()
     run_app(setup_server())
 
 

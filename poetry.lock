@@ -628,6 +628,20 @@ typer = ">=0.12.3"
 standard = ["fastapi", "uvicorn[standard] (>=0.15.0)"]
 
 [[package]]
+name = "fire"
+version = "0.6.0"
+description = "A library for automatically generating command line interfaces."
+optional = false
+python-versions = "*"
+files = [
+    {file = "fire-0.6.0.tar.gz", hash = "sha256:54ec5b996ecdd3c0309c800324a0703d6da512241bc73b553db959d98de0aa66"},
+]
+
+[package.dependencies]
+six = "*"
+termcolor = "*"
+
+[[package]]
 name = "frozenlist"
 version = "1.4.1"
 description = "A list-like structure which implements collections.abc.MutableSequence"
@@ -1129,6 +1143,53 @@ python-versions = ">=3.5"
 files = [
     {file = "idna-3.7-py3-none-any.whl", hash = "sha256:82fee1fc78add43492d3a1898bfa6d8a904cc97d8427f683ed8e798d07761aa0"},
     {file = "idna-3.7.tar.gz", hash = "sha256:028ff3aadf0609c1fd278d8ea3089299412a7a8b9bd005dd08b9f8285bcb5cfc"},
+]
+
+[[package]]
+name = "infisical-python"
+version = "2.2.5"
+description = "Official Infisical SDK for Python (New)"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "infisical_python-2.2.5-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:4a99c189d0d9fa74629147bda5b3bbb45a977de1d275fc5b933588dd68ba8837"},
+    {file = "infisical_python-2.2.5-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:935ae3578bceb6885ce8cab531f105c12480dce122172629a8e94f3f75fda2f6"},
+    {file = "infisical_python-2.2.5-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:6c25b5ed12d12365067dc22142d75fd0219b61b628c85db8fba234c46a380910"},
+    {file = "infisical_python-2.2.5-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:ad80188bf411cd1a756728e9842fd0d2ad51d0b386cfd7baec70e022078eaf32"},
+    {file = "infisical_python-2.2.5-cp310-none-win_amd64.whl", hash = "sha256:b07f1288a7acd60c3910211df4d3804ed73610e5b001f264abc008da3076165a"},
+    {file = "infisical_python-2.2.5-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:7f04f1b7060f364734b17802d34ce4f2b7dbb4307e729d4337f7282966413639"},
+    {file = "infisical_python-2.2.5-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:24b9220c290cb48de9e5baaf86dad96ab5adf5a2a5235098160d59eeb45e554a"},
+    {file = "infisical_python-2.2.5-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:11bec4200456a47cde73935103e87988c906fabfc5e9c9037d95fd7f84e9891f"},
+    {file = "infisical_python-2.2.5-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:8e998bce5802e06af936d03be2027397daea0f227a79a80bcb4fbde1d87751fb"},
+    {file = "infisical_python-2.2.5-cp311-none-win_amd64.whl", hash = "sha256:d52ff0e77f1ffa4c48e159fd608d829dd481fd8a33f999eab05a69f4200c6235"},
+    {file = "infisical_python-2.2.5-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:7f7fdcba0a8fdb52c632c971f52170a0da6d47edce1e23bf737ce767f4ba07fa"},
+    {file = "infisical_python-2.2.5-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:520981c1f080ac3a446a6ab55bd1764b830fda1a810f1eee56027eeb4212a261"},
+    {file = "infisical_python-2.2.5-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:cb4cad37eac63c3a7795d37d47899431238d477b37e5f93524bade8a783775d6"},
+    {file = "infisical_python-2.2.5-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:58bd381c1e6fd6d12cdadbbfae7fc630816f8fab9a088b985cba6f329b32f395"},
+    {file = "infisical_python-2.2.5-cp312-none-win_amd64.whl", hash = "sha256:796926678b856bbb3700ca245d018b33556acb4b3bee86838ac6f4ae603d5c4d"},
+    {file = "infisical_python-2.2.5-cp37-cp37m-macosx_10_12_x86_64.whl", hash = "sha256:06a3612a04e510eda24b3c001a7ffb4492f06a5864c025b9e528518d9ca16f8d"},
+    {file = "infisical_python-2.2.5-cp37-cp37m-macosx_11_0_arm64.whl", hash = "sha256:e292d55dd1b3b9f5cc45bc964041dda50c4d3da30d7b8101af985e9bd4120fd1"},
+    {file = "infisical_python-2.2.5-cp37-cp37m-manylinux_2_28_aarch64.whl", hash = "sha256:ad6ccf4f1006843a7058d7cb8d7f6c1e8a66be8bdc941d939e70cec102464f5f"},
+    {file = "infisical_python-2.2.5-cp37-cp37m-manylinux_2_28_x86_64.whl", hash = "sha256:d0fd68d11a6da9f3d562f836f08c4d6ba99b40320e9214ab7222e0fd225717f1"},
+    {file = "infisical_python-2.2.5-cp37-none-win_amd64.whl", hash = "sha256:2efdac224093bbbddbf65ff5684d9c1fa3669c20069dd0c97bbc8fa958332f2d"},
+    {file = "infisical_python-2.2.5-cp38-cp38-macosx_10_12_x86_64.whl", hash = "sha256:b95f02cad113acdb67f130235bd0bf4dfc2b4f67ab96172d288ee428aa651bd8"},
+    {file = "infisical_python-2.2.5-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:e86a51207c826ca97b626237ac9a69158028f504e1d02c634e0282017fe26f60"},
+    {file = "infisical_python-2.2.5-cp38-cp38-manylinux_2_28_aarch64.whl", hash = "sha256:8b66ad060fdc830d2a04984d44c991ddfbd87f65543493d927a1d90c510a1b16"},
+    {file = "infisical_python-2.2.5-cp38-cp38-manylinux_2_28_x86_64.whl", hash = "sha256:cd67b8dc7cc1357c0584e6c3b2f53b662800e7e134074e721dbb1d5a2e63a937"},
+    {file = "infisical_python-2.2.5-cp38-none-win_amd64.whl", hash = "sha256:26a5aa164802f54a7c7562511946658af7e709d3ee925a9df6175a52a48ba74d"},
+    {file = "infisical_python-2.2.5-cp39-cp39-macosx_10_12_x86_64.whl", hash = "sha256:1c119e33075823b71883f936d31a646e6e4c1b4ea1201080f3792e8b843dc28e"},
+    {file = "infisical_python-2.2.5-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:885f9eda0eef68d04a5443690c8c994275fd08a03c4e4d5d4534e915c1761f31"},
+    {file = "infisical_python-2.2.5-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:3ef1c0bd77556a441e89005fc855a2574e7b45a233cc19a77139870a0dca111c"},
+    {file = "infisical_python-2.2.5-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:40f81c4308c761014b02d4b890e6e876747bd20c0841931314b96fac5daf9fa2"},
+    {file = "infisical_python-2.2.5-cp39-none-win_amd64.whl", hash = "sha256:9eb38caf58ea2ca35a19858f1560d527ed1fd9001f72daeb1772892161bdeb86"},
+    {file = "infisical_python-2.2.5-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:d37d9b546ec3a73ebf5226f9f0d08136c4a22554a3a49260784519a1d7b4ea14"},
+    {file = "infisical_python-2.2.5-pp37-pypy37_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:037ab66c24c5e83b3b3a4d94d6102e3f9841bb689dca00e9ab1ec7397429f151"},
+    {file = "infisical_python-2.2.5-pp37-pypy37_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:ea2fe2d31611d0a343a81e54e01bd24f5525e9394d1eb964d15f91acb3fc7683"},
+    {file = "infisical_python-2.2.5-pp38-pypy38_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:01f93ba4b68c6f9ecd980c5a54cd31c8056c935f68d1899d3f3e22f7f51b72cb"},
+    {file = "infisical_python-2.2.5-pp38-pypy38_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:2cb2f6cc3c38714a6622784dc8828c720fc9404f2a86855de6c52f4153925aa2"},
+    {file = "infisical_python-2.2.5-pp39-pypy39_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:45f5c0d2fad49e4394c3372f9c879800b2aee3cd54bb6051d4eb15f2dd1526c5"},
+    {file = "infisical_python-2.2.5-pp39-pypy39_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:a958fa9c6afcc2c3e3cff1aa29ef8b3a6616b866e8f76cb8daa3251adda252e9"},
+    {file = "infisical_python-2.2.5.tar.gz", hash = "sha256:ebd6468efe4625133f35ecfa754d27a7be50085921d85781b3b7ee2c0ecdeabf"},
 ]
 
 [[package]]
@@ -2476,6 +2537,20 @@ doc = ["reno", "sphinx"]
 test = ["pytest", "tornado (>=4.5)", "typeguard"]
 
 [[package]]
+name = "termcolor"
+version = "2.4.0"
+description = "ANSI color formatting for output in terminal"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "termcolor-2.4.0-py3-none-any.whl", hash = "sha256:9297c0df9c99445c2412e832e882a7884038a25617c60cea2ad69488d4040d63"},
+    {file = "termcolor-2.4.0.tar.gz", hash = "sha256:aab9e56047c8ac41ed798fa36d892a37aca6b3e9159f3e0c24bc64a9b3ac7b7a"},
+]
+
+[package.extras]
+tests = ["pytest", "pytest-cov"]
+
+[[package]]
 name = "tiktoken"
 version = "0.7.0"
 description = "tiktoken is a fast BPE tokeniser for use with OpenAI's models"
@@ -3080,4 +3155,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "43f625d7e7debaf7ff19cd39a6abcb90b0e6681fa881cbc6f16b938c07ffd359"
+content-hash = "e3e8d71f4b0213e7002437a972485f4f0c4a69e7ce6726ba4ec2ca754716658d"
