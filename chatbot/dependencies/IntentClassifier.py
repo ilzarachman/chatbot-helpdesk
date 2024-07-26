@@ -158,14 +158,7 @@ class IntentClassifier:
             prompts, self._intent_classifier_config.get("model_settings")
         )
 
-        try:
-            loop = asyncio.get_running_loop()
-            if loop:
-                print(f"Active event loop: {loop}")
-        except RuntimeError:  # Handles case where no loop is running
-            print("No active event loop found")
-
-        return Intent(intent_str)
+        return Intent(intent_str.strip())
 
     def _build_history_messages(
         self, message: str, history: list[dict]

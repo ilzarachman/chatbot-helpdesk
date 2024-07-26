@@ -26,6 +26,9 @@ class TestDocumentEmbedder(unittest.TestCase):
     def test_instance_init(self):
         self.assertIsInstance(self._instance, DocumentEmbedder)
 
+    def test_instance_singleton(self):
+        self.assertEqual(self._instance, DocumentEmbedder())
+
     @pytest.mark.using_llm
     def test_save_document_to_vectorstore(self):
         self._instance.save_document_to_vectorstore(

@@ -16,10 +16,11 @@ import importlib
 class DocumentEmbedder:
     """This class is responsible for embedding documents into vectors."""
 
-    _supported_document_types: dict[str, type(BaseLoader)] = {
+    supported_document_types: dict[str, type(BaseLoader)] = {
         "txt": document_loaders.TextLoader,
         "pdf": document_loaders.PyPDFLoader,
         "docx": document_loaders.Docx2txtLoader,
+        "doc": document_loaders.Docx2txtLoader,
     }
     """
     Supported document types.
@@ -30,6 +31,8 @@ class DocumentEmbedder:
     - docx
     """
 
+    _instance = None
+
     def __init__(self):
         """Initialize the DocumentEmbedder class."""
         self._embedding_model: TextEmbedder = ModelLoader.load_model(
@@ -39,6 +42,12 @@ class DocumentEmbedder:
             "document_embedder.text_splitter"
         )
         self._text_splitter: TextSplitter = self._get_text_splitter()
+
+    @staticmethod
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     def save_document_to_vectorstore(self, doc_path: str, doc_category: Intent) -> None:
         """
@@ -96,8 +105,8 @@ class DocumentEmbedder:
             RuntimeError: If the document type is not supported.
         """
         doc_type = doc_path.split(".")[-1]
-        if doc_type in self._supported_document_types:
-            loader = self._supported_document_types[doc_type]
+        if doc_type in self.supported_document_types:
+            loader = self.supported_document_types[doc_type]
             try:
                 _loader = loader(doc_path)
                 return _loader.load()
