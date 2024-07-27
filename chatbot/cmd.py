@@ -2,8 +2,11 @@ import os
 
 import fire
 from infisical_client import InfisicalClient
+from dotenv import load_dotenv
 
 from chatbot.dependencies.utils.path_utils import project_path
+
+load_dotenv(override=True)
 
 
 class ChatbotApplication:
@@ -40,6 +43,7 @@ class ChatbotApplication:
 
         command.upgrade(alembic_cfg, "head")
         return 0
+
 
 def cli():
     fire.Fire(ChatbotApplication)
