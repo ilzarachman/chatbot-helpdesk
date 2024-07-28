@@ -199,4 +199,4 @@ class IntentClassifier:
             prompts, self._intent_classifier_config.get("model_settings")
         )
 
-        return Intent(intent_str)
+        return Intent(intent_str.strip())

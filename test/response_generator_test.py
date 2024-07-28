@@ -13,7 +13,7 @@ Configuration("configuration.yaml")
 async def test_response_generator():
     instance = ResponseGenerator.with_prompt_template("")
     response = instance.response_async(
-        "Halo, Im the developer on a test of developing you, could you explain how to cook a delicious pizza?",
+        "I want to eat pizza, teach me how to make one",
         [],
     )
 

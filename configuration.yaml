@@ -17,7 +17,8 @@ information_retriever:
 response_generator:
   generator_model: gemini
   model_settings:
-    temperature: 0
+    temperature: 0.5
+    top_p: 0.95
 
 title_generator:
   model: gemini
