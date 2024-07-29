@@ -2,8 +2,8 @@ from enum import Enum
 
 from fastapi import Depends, HTTPException, status, Request, Response
 
-from chatbot.database.models.Student import Student as UserModel
-from chatbot.database.models.Staff import Staff as StaffModel
+from chatbot.database.models.Student import Student as UserModel, Student
+from chatbot.database.models.Staff import Staff as StaffModel, Staff
 from chatbot.database import SessionLocal
 from chatbot.dependencies.utils.SessionManagement import SessionManagement
 from chatbot.dependencies.utils.SessionManagement import SessionDataType
@@ -22,24 +22,24 @@ def get_token_from_cookie(request: Request) -> str | None:
     cookies = request.cookies
     if "session_token" in cookies:
         return cookies["session_token"]
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, detail="Session token not found"
-    )
+
+    return None
 
 
 class ACL(Enum):
     """
     Enum representing the access levels of a user.
     """
-
+    ALL = -1
     STAFF = 0
     USER = 1
 
 
 def protected_route(access_level: ACL = ACL.STAFF):
+
     async def protected(
         token: str = Depends(get_token_from_cookie), response: Response = None
-    ) -> UserModel | StaffModel:
+    ) -> None | Staff | Student:
         """
         Authenticates a user based on the provided session token.
 
@@ -53,6 +53,9 @@ def protected_route(access_level: ACL = ACL.STAFF):
         Returns:
             user: The authenticated user.
         """
+        if token is None and access_level == ACL.ALL:
+            return None
+
         data = SessionManagement.verify_session_token(token)
         if data is None:
             response.delete_cookie("session_token")
@@ -70,12 +73,12 @@ def protected_route(access_level: ACL = ACL.STAFF):
                     status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
                 )
 
-            if user.access_level > access_level.value:
+            if user.access_level > access_level.value and access_level != ACL.ALL:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED, detail="Access denied"
                 )
 
-            if user is None:
+            if user is None and access_level != ACL.ALL:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
                 )
