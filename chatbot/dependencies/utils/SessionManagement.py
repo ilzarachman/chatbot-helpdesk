@@ -46,6 +46,10 @@ class SessionManagement:
         Returns:
             Any | None: The deserialized data from the token, or None if verification fails.
         """
+
+        if token is None:
+            return None
+
         try:
             data = cls.serializer.loads(token, max_age=15 * 24 * 60 * 60)
             return json.loads(data)
