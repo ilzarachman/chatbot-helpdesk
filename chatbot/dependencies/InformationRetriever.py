@@ -96,9 +96,13 @@ class InformationRetriever:
         Returns:
             str: The relevant information from the documents based on the intent of the message.
         """
-        _db = self._embedding_model.load_public_intent_faiss_index(intent.value)
-        _result = await self._similarity_search_async(message, _db, k=5, public=True)
-        return _result
+        try:
+            _db = self._embedding_model.load_public_intent_faiss_index(intent.value)
+            _result = await self._similarity_search_async(message, _db, k=5, public=True)
+            return _result
+        except FileNotFoundError as e:
+            logger.warning(f"Error in similarity search: {e}")
+            return "Tidak ditemukan informasi untuk ini."
 
     @staticmethod
     async def _similarity_search_async(query: str, faiss_index: FAISS, k: int = 3, **kwargs) -> str:
