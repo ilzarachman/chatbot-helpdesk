@@ -1,21 +1,15 @@
-import json
 from typing import AsyncIterator
 
-from sqlalchemy import func
-
-from chatbot.logger import logger
 from chatbot.dependencies.IntentClassifier import Intent
 from chatbot.dependencies.ResponseGenerator import ResponseGenerator
 from chatbot.dependencies.contracts.BaseIntentHandler import BaseIntentHandler
-from chatbot.database import SessionLocal
-from chatbot.database.models.Message import Message
+from chatbot.logger import logger
 
 
 class OtherIntentHandler(BaseIntentHandler):
     """
     Intent handler for other intent.
     """
-
 
     def __init__(self):
         super().__init__()

@@ -109,10 +109,10 @@ async def handle_chat_for_non_user(
     message: str = chat_message.message
     intent: Intent = await app.intent_classifier.classify(message)
 
-    logger.info(f"get intent: {intent.value}")
+    logger.info(f"get non user intent: {intent.value}")
 
     handler = IntentHandlerFactory.get_handler(intent)
-    response = await handler.with_app(app).handle(message)
+    response = await handler.with_app(app).handle_public(message)
 
     return response
 
