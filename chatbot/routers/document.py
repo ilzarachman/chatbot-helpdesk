@@ -82,20 +82,19 @@ def embed_document(
 
 @router.post("/upload", status_code=status.HTTP_200_OK)
 async def upload_document(
-    file: UploadFile,
+    document_file: UploadFile,
     name: Annotated[str, Form()],
-    uploader_id: Annotated[int, Form()],
     intent: Annotated[str, Form()],
     public: Annotated[bool, Form()],
     background_tasks: BackgroundTasks,
+    auth_user=Depends(protected_route(ACL.STAFF)),
 ):
     """
     Uploads a document to the server.
 
     Parameters:
-        file (UploadFile): The file to be uploaded.
+        document_file (UploadFile): The file to be uploaded.
         name (str): The name of the document.
-        uploader_id (int): The ID of the user uploading the document.
         intent (str): The intent of the document.
         public (bool): Whether the document is public.
         background_tasks (BackgroundTasks): The background tasks object.
@@ -107,9 +106,9 @@ async def upload_document(
         None
     """
     document_metadata = DocumentUpload(
-        name=name, uploader_id=uploader_id, intent=intent, public=public
+        name=name, uploader_id=auth_user.id, intent=intent, public=public
     )
-    file_extension = file.filename.split(".")[-1]
+    file_extension = document_file.filename.split(".")[-1]
 
     if file_extension not in DocumentEmbedder.supported_document_types.keys():
         raise HTTPException(
@@ -117,32 +116,34 @@ async def upload_document(
             detail="File type not supported.",
         )
 
+    uuid_string = str("doc324iyi" + str(datetime.now())).encode()
+    uuid_hashed = str(hashlib.sha256(uuid_string).hexdigest())
+
+    save_folder = f"{DOCUMENT_DIRECTORY}/{document_metadata.intent}"
+    save_filename = f"{save_folder}/{document_file.filename}-{uuid_hashed}.{file_extension}"
+
+    if not os.path.exists(save_folder):
+        os.makedirs(save_folder)
+
+    with open(
+            save_filename,
+            "wb",
+    ) as buffer:
+        contents = await document_file.read()
+        buffer.write(contents)
+
     with SessionLocal() as db:
         document = Document()
         document.name = document_metadata.name
         document.uploader_id = document_metadata.uploader_id
         document.intent = document_metadata.intent
         document.public = document_metadata.public
-
-        uuid_string = str("doc324iyi" + str(datetime.now())).encode()
-        document.uuid = str(hashlib.sha256(uuid_string).hexdigest())
+        document.file_path = save_filename
+        document.uuid = uuid_hashed
 
         db.add(document)
         db.commit()
         db.refresh(document)
-
-    save_folder = f"{DOCUMENT_DIRECTORY}/{document_metadata.intent}"
-    save_filename = f"{save_folder}/{document.uuid}.{file_extension}"
-
-    if not os.path.exists(save_folder):
-        os.makedirs(save_folder)
-
-    with open(
-        save_filename,
-        "wb",
-    ) as buffer:
-        contents = await file.read()
-        buffer.write(contents)
 
     background_tasks.add_task(
         embed_document, save_filename, document_metadata, document.id

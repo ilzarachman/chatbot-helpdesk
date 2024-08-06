@@ -13,6 +13,7 @@ class Document(Base, TimeStampMixin):
     embedded = Column(Boolean, nullable=False, default=False)
     intent = Column(String(length=255), nullable=False)
     public = Column(Boolean, nullable=False, default=False)
+    file_path = Column(String(length=500), nullable=True)
 
     def __repr__(self):
         return f"<Document(id={self.id}, uuid={self.uuid}, name={self.name}, uploader_id={self.uploader_id}, embedded={self.embedded})>"
