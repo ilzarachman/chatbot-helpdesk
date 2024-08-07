@@ -1,9 +1,10 @@
-from typing import Type
+from typing import Type, List
 
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship, Mapped
 
 from chatbot.database import Base, TimeStampMixin
+# from chatbot.database.models.Document import Document
 
 
 class Staff(Base, TimeStampMixin):
@@ -16,6 +17,7 @@ class Staff(Base, TimeStampMixin):
     email = Column(String(length=255), nullable=False, unique=True)
     password = Column(String(length=255), nullable=False)
     salt = Column(String(length=255), nullable=False)
+    documents: Mapped[List["Document"]] = relationship(back_populates="uploader")
 
     @classmethod
     def get_user_by_staff_number(

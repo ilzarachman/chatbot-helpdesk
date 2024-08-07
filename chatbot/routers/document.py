@@ -1,7 +1,5 @@
 import hashlib
-import json
 import os
-import shutil
 from datetime import datetime
 from typing import Annotated
 
@@ -10,27 +8,20 @@ from fastapi import (
     Depends,
     HTTPException,
     status,
-    Request,
     UploadFile,
     BackgroundTasks,
     Form,
 )
+from pydantic import BaseModel
 
 from chatbot.database import SessionLocal
-from chatbot.database.models.Message import Message
-from chatbot.database.models.Student import Student
 from chatbot.database.models.Document import Document
 from chatbot.dependencies.DocumentEmbedder import DocumentEmbedder
-from chatbot.dependencies.utils.auth import protected_route, ACL
-from chatbot.database.models.Conversation import Conversation
-from chatbot.http.Response import Response as ResponseTemplate
-from chatbot.dependencies.TitleGenerator import TitleGenerator
-from chatbot.database.models.Staff import Staff
 from chatbot.dependencies.IntentClassifier import Intent
-from ..Application import Application
-from ..logger import logger
+from chatbot.dependencies.utils.auth import protected_route, ACL
 from chatbot.dependencies.utils.path_utils import project_path
-from pydantic import BaseModel
+from chatbot.http.Response import Response as ResponseTemplate
+from ..logger import logger
 
 router = APIRouter(prefix="/document", tags=["Document"])
 
@@ -46,7 +37,7 @@ DOCUMENT_DIRECTORY = str(project_path("resources", "documents"))
 
 
 def embed_document(
-    document_path: str, metadata: DocumentUpload, document_id: int
+        document_path: str, metadata: DocumentUpload, document_id: int
 ) -> None:
     """
     Embeds a document in the database.
@@ -82,12 +73,12 @@ def embed_document(
 
 @router.post("/upload", status_code=status.HTTP_200_OK)
 async def upload_document(
-    document_file: UploadFile,
-    name: Annotated[str, Form()],
-    intent: Annotated[str, Form()],
-    public: Annotated[bool, Form()],
-    background_tasks: BackgroundTasks,
-    auth_user=Depends(protected_route(ACL.STAFF)),
+        document_file: UploadFile,
+        name: Annotated[str, Form()],
+        intent: Annotated[str, Form()],
+        public: Annotated[bool, Form()],
+        background_tasks: BackgroundTasks,
+        auth_user=Depends(protected_route(ACL.STAFF)),
 ):
     """
     Uploads a document to the server.
@@ -152,4 +143,52 @@ async def upload_document(
     return ResponseTemplate(
         message="Document uploaded successfully",
         data={"document_id": document.id},
+    )
+
+
+class DocumentEach(BaseModel):
+    name: str
+    staff_email: str
+    intent: str
+    public: bool
+    embedded: bool
+    document_uuid: str
+    created_at: str
+    updated_at: str
+
+
+@router.get("/", status_code=status.HTTP_200_OK)
+async def get_all_documents(auth_user=Depends(protected_route(ACL.STAFF))):
+    """
+    Returns all documents in the database.
+
+    Parameters:
+        None
+
+    Raises:
+        None
+
+    Returns:
+        None
+    """
+    with SessionLocal() as db:
+        documents = db.query(Document).all()
+
+        documents_response = [
+            DocumentEach(
+                name=document.name,
+                staff_email=document.uploader.email,
+                intent=document.intent,
+                public=document.public,
+                embedded=document.embedded,
+                document_uuid=document.uuid,
+                created_at=str(document.created_at),
+                updated_at=str(document.updated_at),
+            )
+            for document in documents
+        ]
+
+    return ResponseTemplate(
+        message="Documents retrieved successfully",
+        data=documents_response,
     )

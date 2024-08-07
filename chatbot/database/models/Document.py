@@ -1,5 +1,8 @@
-from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean
+from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, ForeignKey
+from sqlalchemy.orm import relationship, mapped_column, Mapped
+
 from chatbot.database import Base, TimeStampMixin
+# from chatbot.database.models.Staff import Staff
 
 
 class Document(Base, TimeStampMixin):
@@ -9,7 +12,8 @@ class Document(Base, TimeStampMixin):
     uuid = Column(String(length=255), nullable=False, unique=True)
 
     name = Column(String(length=255), nullable=False)
-    uploader_id = Column(Integer, nullable=False)
+    uploader_id: Mapped[int] = mapped_column(ForeignKey("staffs.id"))
+    uploader: Mapped["Staff"] = relationship("Staff", back_populates="documents")
     embedded = Column(Boolean, nullable=False, default=False)
     intent = Column(String(length=255), nullable=False)
     public = Column(Boolean, nullable=False, default=False)
