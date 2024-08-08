@@ -82,7 +82,7 @@ class ResponseGenerator:
         return prompts
 
     async def response_async(
-        self, message: str, history: list[dict]
+        self, message: str, history: list[dict] | None
     ) -> AsyncIterator[str]:
         """
         Generate a response based on the input.
@@ -96,6 +96,9 @@ class ResponseGenerator:
         Yields:
             str: The response string.
         """
+        if history is None:
+            history = []
+
         prompts: list[Message] = self._build_history_messages(message, history)
 
         logger.debug(f"Prompts: {[str(prompt) for prompt in prompts]} ")
@@ -104,5 +107,13 @@ class ResponseGenerator:
             prompts, self._config.get("model_settings")
         )
 
+        response_text = ""
+
         async for chunk in aiter(async_res):
+            response_text += chunk
             yield chunk
+
+        if len(response_text) > 100:
+            logger.debug(f"Response: {response_text[:100]} ... {response_text[-10:]}")
+        else:
+            logger.debug(f"Response: {response_text}")

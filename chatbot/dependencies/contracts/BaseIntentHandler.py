@@ -1,14 +1,15 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Optional, AsyncIterator, List
 
 from jinja2 import Template
-from pydantic import BaseModel
 
 from chatbot.Application import Application
 from chatbot.dependencies.InformationRetriever import InformationRetriever
-from chatbot.dependencies.IntentClassifier import Intent, IntentClassifier
+from chatbot.dependencies.IntentClassifier import Intent
 from chatbot.dependencies.PromptManager import PromptManager
-from chatbot.dependencies.contracts.message import Message, UserMessage
+from chatbot.dependencies.ResponseGenerator import ResponseGenerator
+from chatbot.dependencies.contracts.message import Message
+from chatbot.logger import logger
 
 
 class BaseIntentHandler(ABC):
@@ -17,8 +18,10 @@ class BaseIntentHandler(ABC):
     """
 
     def __init__(self):
+        self._intent = None
         self._application: Optional[Application] = None
         self._prompt_template: Optional[Template] = None
+        self._public_prompt_template: Optional[Template] = None
         self._history: Optional[List[Message]] = None
 
     @property
@@ -30,6 +33,16 @@ class BaseIntentHandler(ABC):
             str: The prompt template.
         """
         return self._prompt_template
+
+    @property
+    def public_prompt_template(self) -> Template:
+        """
+        Gets the public prompt template.
+
+        Returns:
+            str: The public prompt template.
+        """
+        return self._public_prompt_template
 
     @property
     def application(self) -> Optional[Application]:
@@ -77,20 +90,42 @@ class BaseIntentHandler(ABC):
         _prompt_template_no_context = PromptManager.get_prompt_template(
             "response_generator", intent.name
         )
+
+        _public_prompt_template_no_context = PromptManager.get_prompt_template(
+            "public_response_generator", intent.name
+        )
+
         self._prompt_template = _prompt_template_no_context
+        self._public_prompt_template = _public_prompt_template_no_context
         return self
 
-    def build_prompt_with_information(self, information: str) -> str:
+    def build_prompt_with_information(self, information: str | None) -> str:
         """
         Builds the prompt with information.
 
         Parameters:
-            information (str): The information.
+            information (str | None): The information.
 
         Returns:
             str: The prompt with information.
         """
+        if information is None:
+            return self._prompt_template.render()
         return self._prompt_template.render(information=information)
+
+    def build_public_prompt_with_information(self, information: str | None = None) -> str:
+        """
+        Builds the prompt with information.
+
+        Parameters:
+            information (str | None): The information.
+
+        Returns:
+            str: The prompt with information.
+        """
+        if information is None:
+            return self._public_prompt_template.render()
+        return self._public_prompt_template.render(information=information)
 
     def build_prompt(self, context: Optional[dict] = None) -> str:
         """
@@ -106,7 +141,6 @@ class BaseIntentHandler(ABC):
             context = {}
         return self._prompt_template.render(**context)
 
-    @abstractmethod
     async def handle(self, message: str, history: list[dict] | None = None) -> AsyncIterator[str]:
         """
         Handles the intent of the message.
@@ -115,9 +149,47 @@ class BaseIntentHandler(ABC):
 
         Parameters:
             message (str): The message to be handled.
-            history (List[dict]): The history list.
+            history (list[dict]): The history list.
 
         Returns:
             str: The response to the message.
         """
-        pass
+        if self._intent is None:
+            raise NotImplementedError("intent is not set")
+
+        logger.debug(f"Handling intent: {self._intent}")
+
+        information = await self.information_retriever.retrieve_async(
+            message, self._intent
+        )
+        prompt_template = self.build_prompt_with_information(information)
+        response_generator = ResponseGenerator.with_prompt_template(prompt_template)
+        response = response_generator.response_async(message, history)
+
+        return response
+
+    async def handle_public(self, message: str) -> AsyncIterator[str]:
+        """
+        Handles the intent of the message.
+
+        This function takes a message as input and returns the response as a string.
+
+        Parameters:
+            message (str): The message to be handled.
+
+        Returns:
+            str: The response to the message.
+        """
+        if self._intent is None:
+            raise NotImplementedError("intent is not set")
+
+        logger.debug(f"Handling public intent: {self._intent}")
+
+        information = await self.information_retriever.retrieve_public_async(
+            message, self._intent
+        )
+        prompt_template = self.build_public_prompt_with_information(information)
+        response_generator = ResponseGenerator.with_prompt_template(prompt_template)
+        response = response_generator.response_async(message, [])
+
+        return response

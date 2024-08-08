@@ -77,9 +77,36 @@ class InformationRetriever:
         Returns:
             str: The relevant information from the documents based on the intent of the message.
         """
-        _db = self._embedding_model.load_intent_faiss_index(intent.value)
-        _result = await self._similarity_search_async(message, _db, k=5)
-        return _result
+        try:
+            _db = self._embedding_model.load_intent_faiss_index(intent.value)
+            _result = await self._similarity_search_async(message, _db, k=5)
+            return _result
+        except RuntimeError as e:
+            logger.warning(f"Error in similarity search: {e}")
+            return "Tidak ditemukan informasi untuk ini."
+
+    async def retrieve_public_async(self, message: str, intent: Intent) -> str:
+        """Retrieve the relevant information from the documents based on the intent of the message.
+
+        This function takes a message as input and returns the relevant information from the documents as a string.
+
+        It should be able to handle multiple documents and retrieve the relevant information from each one based on
+        the intent of the message.
+
+        Parameters:
+            message (str): The message to retrieve information based on.
+            intent (str): The intent of the message.
+
+        Returns:
+            str: The relevant information from the documents based on the intent of the message.
+        """
+        try:
+            _db = self._embedding_model.load_public_intent_faiss_index(intent.value)
+            _result = await self._similarity_search_async(message, _db, k=5, public=True)
+            return _result
+        except RuntimeError as e:
+            logger.warning(f"Error in similarity search: {e}")
+            return "Tidak ditemukan informasi untuk ini."
 
     @staticmethod
     async def _similarity_search_async(query: str, faiss_index: FAISS, k: int = 3, **kwargs) -> str:

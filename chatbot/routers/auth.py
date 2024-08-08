@@ -1,17 +1,18 @@
 import hashlib
 
-from fastapi import APIRouter, Response, HTTPException, status, Request, Depends
-from chatbot.http.Response import Response as ResponseTemplate
+from fastapi import APIRouter, Response, HTTPException, status, Depends
 from pydantic import BaseModel
-from chatbot.database.models.Student import Student as UserModel
-from chatbot.database.models.Staff import Staff as StaffModel
+
 from chatbot.database import SessionLocal
+from chatbot.database.models.Staff import Staff as StaffModel
+from chatbot.database.models.Student import Student as UserModel
 from chatbot.dependencies.utils.SessionManagement import (
     SessionManagement,
     SessionData,
     SessionDataType,
 )
 from chatbot.dependencies.utils.auth import protected_route, ACL
+from chatbot.http.Response import Response as ResponseTemplate
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -27,7 +28,41 @@ async def get_auth(auth: str = Depends(protected_route(ACL.USER))):
     Returns:
     - bool: True if the authentication is successful, False otherwise.
     """
-    return True
+    if isinstance(auth, UserModel):
+        return ACL.USER.value
+
+    if isinstance(auth, StaffModel):
+        return ACL.STAFF.value
+
+    return None
+
+
+@router.get("/user", status_code=status.HTTP_200_OK)
+async def get_user(auth_user=Depends(protected_route(ACL.USER))):
+    """
+    Retrieves user information based on the provided auth token.
+
+    Parameters:
+    - auth_user (User, optional): The authenticated user.
+
+    Returns:
+    - User: The authenticated user.
+    """
+    if isinstance(auth_user, UserModel):
+        return {
+            "number": auth_user.student_number,
+            "name": auth_user.name,
+            "email": auth_user.email,
+        }
+
+    if isinstance(auth_user, StaffModel):
+        return {
+            "number": auth_user.staff_number,
+            "name": auth_user.name,
+            "email": auth_user.email,
+        }
+
+    return None
 
 
 class StudentCredential(BaseModel):

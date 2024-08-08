@@ -35,7 +35,7 @@ def setup_server() -> FastAPI:
     )
     server = FastAPI()
 
-    origins = ["http://localhost:3000"]
+    origins = ["http://localhost:3000", "http://localhost:3001"]
 
     server.add_middleware(
         CORSMiddleware,

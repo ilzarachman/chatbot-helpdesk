@@ -117,3 +117,27 @@ class TextEmbedder(ABC):
             raise FileNotFoundError(f"FAISS index for {intent_value} not found.")
         except Exception as e:
             raise Exception(f"Error loading the FAISS index: {e}")
+
+    def load_public_intent_faiss_index(self, intent_value: str) -> FAISS:
+        """
+        Load the public FAISS index for the intent.
+
+        Args:
+            intent_value (str): The value of the intent.
+
+        Returns:
+            FAISS: The public FAISS index for the intent.
+
+        Raises:
+            Exception: Error loading the public FAISS index.
+        """
+        try:
+            faiss_root_dir = project_path("faiss")
+            faiss_intent_dir = faiss_root_dir / (intent_value + "_public")
+            return FAISS.load_local(
+                f"{faiss_intent_dir}",
+                self.model,
+                allow_dangerous_deserialization=True,
+            )
+        except FileNotFoundError:
+            logger.error(f"Public FAISS index for {intent_value} not found.")

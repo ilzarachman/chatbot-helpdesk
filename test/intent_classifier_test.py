@@ -35,11 +35,11 @@ async def test_classify_returns_intent_support():
     )
     assert intent == Intent.SUPPORT
 
-    # intent = await _intent_classifier.classify("Halo, apa kabar?")
-    # assert intent == Intent.OTHER
-    #
-    # intent = await _intent_classifier.classify("Toilet kampus ada di mana?")
-    # assert intent == Intent.RESOURCE_SERVICE
-    #
-    # intent = await _intent_classifier.classify("Jurusan apa saja yang ada di kampus?")
-    # assert intent == Intent.ACADEMIC_ADMINISTRATION
+    intent = await _intent_classifier.classify("Halo, apa kabar?")
+    assert intent == Intent.OTHER
+
+    intent = await _intent_classifier.classify("Toilet kampus ada di mana?")
+    assert intent == Intent.RESOURCE_SERVICE
+
+    intent = await _intent_classifier.classify("Jurusan apa saja yang ada di kampus?")
+    assert intent == Intent.ACADEMIC_ADMINISTRATION
