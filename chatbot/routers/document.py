@@ -172,7 +172,7 @@ async def get_all_documents(auth_user=Depends(protected_route(ACL.STAFF))):
         None
     """
     with SessionLocal() as db:
-        documents = db.query(Document).all()
+        documents = db.query(Document).order_by(Document.id.desc()).all()
 
         documents_response = [
             DocumentEach(
