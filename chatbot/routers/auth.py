@@ -18,7 +18,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
-async def get_auth(auth: str = Depends(protected_route(ACL.USER))):
+async def get_auth(auth: StaffModel | UserModel = Depends(protected_route(ACL.USER))):
     """
     Retrieves authentication information based on the provided auth token.
 
@@ -29,10 +29,16 @@ async def get_auth(auth: str = Depends(protected_route(ACL.USER))):
     - bool: True if the authentication is successful, False otherwise.
     """
     if isinstance(auth, UserModel):
-        return ACL.USER.value
+        return {
+            "access_level": ACL.USER.value,
+            "user": auth
+        }
 
     if isinstance(auth, StaffModel):
-        return ACL.STAFF.value
+        return {
+            "access_level": ACL.STAFF.value,
+            "user": auth
+        }
 
     return None
 

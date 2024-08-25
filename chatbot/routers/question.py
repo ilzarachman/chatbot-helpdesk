@@ -4,12 +4,15 @@ from pydantic import BaseModel
 from chatbot.database import SessionLocal
 from chatbot.database.models.Questions import Question
 from chatbot.dependencies.DocumentEmbedder import DocumentEmbedder
+from chatbot.dependencies.EmailHandler import EmailHandler, EmailSchema
 from chatbot.dependencies.IntentClassifier import Intent
 from chatbot.dependencies.utils.auth import protected_route, ACL
 from chatbot.http.Response import Response as ResponseTemplate
 from chatbot.logger import logger
 
 router = APIRouter(prefix="/question", tags=["Question Answering"])
+
+email_sender = EmailHandler()
 
 
 class CreateQuestionRequest(BaseModel):
@@ -90,9 +93,11 @@ async def create_public_question(
         db.add(question)
         db.commit()
 
+        question_id = question.id
+
     return ResponseTemplate(
         message="Question created successfully",
-        data={"question_id": question.id},
+        data={"question_id": question_id},
     )
 
 
@@ -190,7 +195,13 @@ async def answer_question(
     # TODO: Use background task to save question and answer to vectorstore
     background_tasks.add_task(embed_save_question, question.prompt, question.bot_answer, _intent,
                               answer.public)
+
     # Send answered question to the email
+    await email_sender.send_email(EmailSchema(
+        email=[_email],
+        subject="Answered Question",
+        body=f"Your question has been answered. Answer: {question.bot_answer}",
+    ))
 
     return ResponseTemplate(
         message="Answered successfully",
