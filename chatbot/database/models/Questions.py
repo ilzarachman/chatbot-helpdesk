@@ -10,9 +10,9 @@ class Question(Base, TimeStampMixin):
     __tablename__ = "questions"
 
     id = Column(Integer, primary_key=True)
-    prompt = Column(String(length=255), nullable=False)
-    staff_answer = Column(String(length=255), nullable=True)
-    bot_answer = Column(String(length=255), nullable=True)
+    prompt = Column(Text, nullable=False)
+    staff_answer = Column(Text, nullable=True)
+    bot_answer = Column(Text, nullable=True)
     intent = Column(String(length=255), nullable=True)
     public = Column(Boolean, nullable=False, default=False)
     message = Column(Text, nullable=True)
