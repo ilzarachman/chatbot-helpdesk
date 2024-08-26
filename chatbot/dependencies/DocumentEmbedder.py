@@ -1,16 +1,15 @@
-from pathlib import Path
+import importlib
 
+from langchain_community import document_loaders
+from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
+from langchain_text_splitters import TextSplitter
 
 from .IntentClassifier import Intent
 from .ModelLoader import ModelLoader
 from .contracts.TextEmbedder import TextEmbedder
 from .utils.path_utils import project_path
 from ..config import Configuration
-from langchain_community import document_loaders
-from langchain_community.document_loaders.base import BaseLoader
-from langchain_text_splitters import TextSplitter
-import importlib
 
 
 class DocumentEmbedder:
@@ -177,3 +176,47 @@ class DocumentEmbedder:
             return
 
         self._embedding_model.add_data_to_faiss_index(documents, faiss_category_dir)
+
+    def save_question_answer_to_vectorstore(self, question: str, answer: str, category: Intent) -> None:
+        """
+        Saves a question.py and answer to the vectorstorage.
+
+        Args:
+            question (str): The question.py to be saved.
+            answer (str): The answer to be saved.
+            category (Intent): The type of the question.py and answer.
+
+        Returns:
+            None
+
+        Raises:
+            RuntimeError: question.py and answer can't be saved.
+        """
+        try:
+            data = str({"question.py": question, "answer": answer})
+            documents = self._split_raw_document([Document(data)])
+            self._save_to_faiss_index(documents, category)
+        except Exception as e:
+            raise RuntimeError(f"Error saving question.py and answer to vectorstore: {e}")
+
+    def save_public_question_answer_to_vectorstore(self, question: str, answer: str, category: Intent) -> None:
+        """
+        Saves a public question.py and answer to the vectorstorage.
+
+        Args:
+            question (str): The question.py to be saved.
+            answer (str): The answer to be saved.
+            category (Intent): The type of the question.py and answer.
+
+        Returns:
+            None
+
+        Raises:
+            RuntimeError: question.py and answer can't be saved.
+        """
+        try:
+            data = str({"question.py": question, "answer": answer})
+            documents = self._split_raw_document([Document(data)])
+            self._save_public_to_faiss_index(documents, category)
+        except Exception as e:
+            raise RuntimeError(f"Error saving question.py and answer to vectorstore: {e}")

@@ -36,6 +36,7 @@ fire = "^0.6.0"
 
 infisical-python = "^2.2.5"
 python-multipart = "^0.0.9"
+fastapi-mail = "^1.4.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
