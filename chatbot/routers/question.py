@@ -200,7 +200,7 @@ async def answer_question(
     await email_sender.send_email(EmailSchema(
         email=[_email],
         subject="Answered Question",
-        body=f"Your question has been answered. Answer: {question.bot_answer}",
+        body=f"Your question has been answered. Answer: {question.staff_answer}",
     ))
 
     return ResponseTemplate(
