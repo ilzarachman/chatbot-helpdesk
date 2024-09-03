@@ -120,5 +120,6 @@ dmypy.json
 # Add editor configuration
 .vscode/
 .idx/
+.idea/
 
 .infisical.*
