@@ -13,6 +13,8 @@ document_embedder:
 
 information_retriever:
   embedding_model: openaiembeddings
+  retriever_settings:
+    k: 10
 
 response_generator:
   generator_model: gemini

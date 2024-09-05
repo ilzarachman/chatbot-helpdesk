@@ -21,6 +21,9 @@ class InformationRetriever:
         self._embedding_model: TextEmbedder = ModelLoader.load_model(
             Configuration.get("document_embedder.embedding_model")
         )
+        self._retriever_settings: dict = Configuration.get(
+            "information_retriever.retriever_settings"
+        )
 
     def retrieve(self, message: str, intent: Intent) -> str:
         """Retrieve the relevant information from the documents based on the intent of the message.
@@ -38,7 +41,7 @@ class InformationRetriever:
             str: The relevant information from the documents based on the intent of the message.
         """
         _db = self._embedding_model.load_intent_faiss_index(intent.value)
-        _result = self._similarity_search(message, _db, k=5)
+        _result = self._similarity_search(message, _db, k=self._retriever_settings["k"])
         return _result
 
     @staticmethod
@@ -79,7 +82,7 @@ class InformationRetriever:
         """
         try:
             _db = self._embedding_model.load_intent_faiss_index(intent.value)
-            _result = await self._similarity_search_async(message, _db, k=5)
+            _result = await self._similarity_search_async(message, _db, k=self._retriever_settings["k"])
             return _result
         except RuntimeError as e:
             logger.warning(f"Error in similarity search: {e}")
@@ -102,7 +105,7 @@ class InformationRetriever:
         """
         try:
             _db = self._embedding_model.load_public_intent_faiss_index(intent.value)
-            _result = await self._similarity_search_async(message, _db, k=5, public=True)
+            _result = await self._similarity_search_async(message, _db, k=self._retriever_settings["k"], public=True)
             return _result
         except RuntimeError as e:
             logger.warning(f"Error in similarity search: {e}")
