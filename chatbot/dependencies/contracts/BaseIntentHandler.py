@@ -159,8 +159,12 @@ class BaseIntentHandler(ABC):
 
         logger.debug(f"Handling intent: {self._intent}")
 
+        message_with_history = "\n".join([f"{message['U']}\n{message['A']}" for message in history]) + "\n" + message
+
+        logger.debug(f"Message with history: {message_with_history}")
+
         information = await self.information_retriever.retrieve_async(
-            message, self._intent
+            message_with_history, self._intent
         )
         prompt_template = self.build_prompt_with_information(information)
         response_generator = ResponseGenerator.with_prompt_template(prompt_template)

@@ -176,6 +176,7 @@ class IntentClassifier:
         prompts: list[Message] = [SystemMessage(self._prompt_template)]
 
         for msg in history:
+            prompts.append(UserMessage(msg["U"]))
             prompts.append(UserMessage(msg["A"]))
         prompts.append(UserMessage(message))
 
