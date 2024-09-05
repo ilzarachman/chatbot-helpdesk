@@ -37,7 +37,7 @@ DOCUMENT_DIRECTORY = str(project_path("resources", "documents"))
 
 
 def embed_document(
-        document_path: str, metadata: DocumentUpload, document_id: int
+    document_path: str, metadata: DocumentUpload, document_id: int
 ) -> None:
     """
     Embeds a document in the database.
@@ -73,12 +73,12 @@ def embed_document(
 
 @router.post("/upload", status_code=status.HTTP_200_OK)
 async def upload_document(
-        document_file: UploadFile,
-        name: Annotated[str, Form()],
-        intent: Annotated[str, Form()],
-        public: Annotated[bool, Form()],
-        background_tasks: BackgroundTasks,
-        auth_user=Depends(protected_route(ACL.STAFF)),
+    document_file: UploadFile,
+    name: Annotated[str, Form()],
+    intent: Annotated[str, Form()],
+    public: Annotated[bool, Form()],
+    background_tasks: BackgroundTasks,
+    auth_user=Depends(protected_route(ACL.STAFF)),
 ):
     """
     Uploads a document to the server.
@@ -111,14 +111,16 @@ async def upload_document(
     uuid_hashed = str(hashlib.sha256(uuid_string).hexdigest())
 
     save_folder = f"{DOCUMENT_DIRECTORY}/{document_metadata.intent}"
-    save_filename = f"{save_folder}/{document_file.filename}-{uuid_hashed}.{file_extension}"
+    save_filename = (
+        f"{save_folder}/{document_file.filename}-{uuid_hashed}.{file_extension}"
+    )
 
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
 
     with open(
-            save_filename,
-            "wb",
+        save_filename,
+        "wb",
     ) as buffer:
         contents = await document_file.read()
         buffer.write(contents)
@@ -191,4 +193,26 @@ async def get_all_documents(auth_user=Depends(protected_route(ACL.STAFF))):
     return ResponseTemplate(
         message="Documents retrieved successfully",
         data=documents_response,
+    )
+
+
+@router.delete("/{document_id}", status_code=status.HTTP_200_OK)
+async def delete_document(
+    document_id: int, auth_user=Depends(protected_route(ACL.STAFF))
+):
+    """
+    Deletes a document from the database.
+
+    Args:
+        document_id (int): The ID of the document to be deleted.
+
+    Returns:
+        None
+    """
+    with SessionLocal() as db:
+        db.query(Document).filter(Document.id == document_id).delete()
+        db.commit()
+
+    return ResponseTemplate(
+        message="Document deleted successfully", data={"document_id": document_id}
     )
