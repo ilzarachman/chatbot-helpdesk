@@ -53,14 +53,23 @@ def embed_document(
     document_embedder = DocumentEmbedder()
 
     logger.debug(f"Embedding document: {document_path}")
-    if metadata.public:
-        document_embedder.save_public_document_to_vectorstore(
-            document_path, Intent(metadata.intent.strip())
-        )
-    else:
-        document_embedder.save_document_to_vectorstore(
-            document_path, Intent(metadata.intent.strip())
-        )
+
+    # Split the intents from the metadata by comma
+    metadata.intent = metadata.intent.split(",")
+
+    for intent in metadata.intent:
+        logger.debug(f"[embedding]: {document_path} with intent: {intent}")
+        if metadata.public:
+            document_embedder.save_public_document_to_vectorstore(
+                document_path, Intent(intent.strip())
+            )
+            document_embedder.save_document_to_vectorstore(
+                document_path, Intent(intent.strip())
+            )
+        else:
+            document_embedder.save_document_to_vectorstore(
+                document_path, Intent(intent.strip())
+            )
 
     with SessionLocal() as db:
         db.query(Document).filter(Document.id == document_id).update(

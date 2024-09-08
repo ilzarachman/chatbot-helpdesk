@@ -20,6 +20,7 @@ class DocumentEmbedder:
         "pdf": document_loaders.PyPDFLoader,
         "docx": document_loaders.Docx2txtLoader,
         "doc": document_loaders.Docx2txtLoader,
+        "csv": document_loaders.CSVLoader,
     }
     """
     Supported document types.
@@ -69,7 +70,9 @@ class DocumentEmbedder:
         except Exception as e:
             raise RuntimeError(f"Error saving document to vectorstore: {e}")
 
-    def save_public_document_to_vectorstore(self, doc_path: str, doc_category: Intent) -> None:
+    def save_public_document_to_vectorstore(
+        self, doc_path: str, doc_category: Intent
+    ) -> None:
         """
         Saves a public document to the vectorstorage.
 
@@ -158,7 +161,9 @@ class DocumentEmbedder:
 
         self._embedding_model.add_data_to_faiss_index(documents, faiss_category_dir)
 
-    def _save_public_to_faiss_index(self, documents: list[Document], category: Intent) -> None:
+    def _save_public_to_faiss_index(
+        self, documents: list[Document], category: Intent
+    ) -> None:
         """
         Saves a public document to the FAISS index.
 
@@ -177,7 +182,9 @@ class DocumentEmbedder:
 
         self._embedding_model.add_data_to_faiss_index(documents, faiss_category_dir)
 
-    def save_question_answer_to_vectorstore(self, question: str, answer: str, category: Intent) -> None:
+    def save_question_answer_to_vectorstore(
+        self, question: str, answer: str, category: Intent
+    ) -> None:
         """
         Saves a question.py and answer to the vectorstorage.
 
@@ -197,9 +204,13 @@ class DocumentEmbedder:
             documents = self._split_raw_document([Document(data)])
             self._save_to_faiss_index(documents, category)
         except Exception as e:
-            raise RuntimeError(f"Error saving question.py and answer to vectorstore: {e}")
+            raise RuntimeError(
+                f"Error saving question.py and answer to vectorstore: {e}"
+            )
 
-    def save_public_question_answer_to_vectorstore(self, question: str, answer: str, category: Intent) -> None:
+    def save_public_question_answer_to_vectorstore(
+        self, question: str, answer: str, category: Intent
+    ) -> None:
         """
         Saves a public question.py and answer to the vectorstorage.
 
@@ -219,4 +230,6 @@ class DocumentEmbedder:
             documents = self._split_raw_document([Document(data)])
             self._save_public_to_faiss_index(documents, category)
         except Exception as e:
-            raise RuntimeError(f"Error saving question.py and answer to vectorstore: {e}")
+            raise RuntimeError(
+                f"Error saving question.py and answer to vectorstore: {e}"
+            )

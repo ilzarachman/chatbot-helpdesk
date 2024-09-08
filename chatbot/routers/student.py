@@ -33,6 +33,7 @@ class Student(BaseModel):
     student_number: str
     name: str
     email: str
+    created_at: str
 
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
@@ -73,6 +74,7 @@ async def create_user(
             student_number=new_user.student_number,
             name=new_user.name,
             email=new_user.email,
+            created_at=str(new_user.created_at),
         ),
         message="User created",
     )
@@ -199,7 +201,7 @@ async def get_all_users(auth_user=Depends(protected_route())) -> Response:
         dict: A message indicating successful user retrieval and the retrieved user details.
     """
     with SessionLocal() as db:
-        users = db.query(UserModel).all()
+        users = db.query(UserModel).order_by(UserModel.id.desc()).all()
 
         _users = [
             Student(
@@ -207,6 +209,7 @@ async def get_all_users(auth_user=Depends(protected_route())) -> Response:
                 student_number=user.student_number,
                 name=user.name,
                 email=user.email,
+                created_at=str(user.created_at),
             )
             for user in users
         ]
