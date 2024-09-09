@@ -57,6 +57,7 @@ class Gemini(TextGenerator):
     class GeminiResponse:
         def __init__(self, response: str):
             self.response = re.sub(r"</MSG>", "", response)
+            self.response = re.sub(r"<MSG>", "", self.response)
 
         def __str__(self):
             return self.response
@@ -190,7 +191,7 @@ class Gemini(TextGenerator):
         res = self._generate(prompt, config, stream=True)
         try:
             for chunk in res:
-                if "</MSG>" in chunk.text:
+                if "</MSG>" or "<MSG>" in chunk.text:
                     yield str(Gemini.GeminiResponse(chunk.text))
                     continue
                 yield chunk.text
