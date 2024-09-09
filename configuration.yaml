@@ -9,7 +9,7 @@ document_embedder:
     type: RecursiveCharacterTextSplitter
     params:
       chunk_size: 600
-      chunk_overlap: 20
+      chunk_overlap: 120
 
 information_retriever:
   embedding_model: openaiembeddings
