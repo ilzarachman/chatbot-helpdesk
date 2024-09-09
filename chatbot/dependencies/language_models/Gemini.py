@@ -42,21 +42,21 @@ class Gemini(TextGenerator):
 
     class GeminiUserMessage(UserMessage):
         def __str__(self):
-            return f"input: <msg>{self.message}</msg>"
+            return f"input: <MSG>{self.message}</MSG>"
 
     class GeminiAssistantMessage(AssistantMessage):
         def __str__(self):
             if not self.message:
-                return f"output: <msg>"
-            return f"output: <msg>{self.message}</msg>"
+                return f"output: <MSG>"
+            return f"output: <MSG>{self.message}</MSG>"
 
     class GeminiSystemMessage(SystemMessage):
         def __str__(self):
-            return f"system: <msg>{self.message}</msg>"
+            return f"system: <MSG>{self.message}</MSG>"
 
     class GeminiResponse:
         def __init__(self, response: str):
-            self.response = re.sub(r"\n?</msg>$", "", response)
+            self.response = re.sub(r"</MSG>", "", response)
 
         def __str__(self):
             return self.response
@@ -84,18 +84,18 @@ class Gemini(TextGenerator):
         """
         casted_messages: list[str] = []
         try:
-            for msg in messages:
-                if isinstance(msg, UserMessage):
-                    casted_messages.append(str(Gemini.GeminiUserMessage(msg.message)))
-                elif isinstance(msg, AssistantMessage):
+            for MSG in messages:
+                if isinstance(MSG, UserMessage):
+                    casted_messages.append(str(Gemini.GeminiUserMessage(MSG.message)))
+                elif isinstance(MSG, AssistantMessage):
                     casted_messages.append(
-                        str(Gemini.GeminiAssistantMessage(msg.message))
+                        str(Gemini.GeminiAssistantMessage(MSG.message))
                     )
-                elif isinstance(msg, SystemMessage):
-                    casted_messages.append(str(Gemini.GeminiSystemMessage(msg.message)))
+                elif isinstance(MSG, SystemMessage):
+                    casted_messages.append(str(Gemini.GeminiSystemMessage(MSG.message)))
 
             casted_messages.append(str(Gemini.GeminiAssistantMessage(None)))
-            return "\n".join([msg for msg in casted_messages])
+            return "\n".join([MSG for MSG in casted_messages])
         except Exception as e:
             logger.error(e)
 
@@ -190,7 +190,7 @@ class Gemini(TextGenerator):
         res = self._generate(prompt, config, stream=True)
         try:
             for chunk in res:
-                if "</msg>" in chunk.text:
+                if "</MSG>" in chunk.text:
                     yield str(Gemini.GeminiResponse(chunk.text))
                     continue
                 yield chunk.text
@@ -245,7 +245,7 @@ class Gemini(TextGenerator):
         res = await self._generate_async(prompt, config, stream=True)
         try:
             async for chunk in res:
-                if "</msg>" in chunk.text:
+                if "</MSG>" in chunk.text:
                     yield str(Gemini.GeminiResponse(chunk.text))
                     continue
                 yield chunk.text
