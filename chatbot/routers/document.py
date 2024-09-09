@@ -205,9 +205,9 @@ async def get_all_documents(auth_user=Depends(protected_route(ACL.STAFF))):
     )
 
 
-@router.delete("/{document_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{document_uuid}", status_code=status.HTTP_200_OK)
 async def delete_document(
-    document_id: int, auth_user=Depends(protected_route(ACL.STAFF))
+    document_uuid: str, auth_user=Depends(protected_route(ACL.STAFF))
 ):
     """
     Deletes a document from the database.
@@ -219,9 +219,9 @@ async def delete_document(
         None
     """
     with SessionLocal() as db:
-        db.query(Document).filter(Document.id == document_id).delete()
+        db.query(Document).filter(Document.uuid == document_uuid).delete()
         db.commit()
 
     return ResponseTemplate(
-        message="Document deleted successfully", data={"document_id": document_id}
+        message="Document deleted successfully", data={"document_id": document_uuid}
     )
