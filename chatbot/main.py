@@ -23,6 +23,7 @@ def setup_server() -> FastAPI:
     from chatbot.dependencies.InformationRetriever import InformationRetriever
     from chatbot.dependencies.IntentClassifier import IntentClassifier
     from fastapi.middleware.cors import CORSMiddleware
+    from starlette.middleware.sessions import SessionMiddleware
 
     configure_logging()  # Configure logging
 
@@ -44,6 +45,10 @@ def setup_server() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    SESSION_SECRET_KEY = "2ddwqws2no"
+
+    server.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET_KEY)
 
     server.include_router(router)
 
