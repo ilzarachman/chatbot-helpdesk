@@ -152,12 +152,7 @@ async def delete_user(user_id: int, auth_user=Depends(protected_route())) -> Res
             db.commit()
 
             return Response(
-                data=Student(
-                    id=user_to_delete.id,
-                    student_number=user_to_delete.student_number,
-                    name=user_to_delete.name,
-                    email=user_to_delete.email,
-                ),
+                data={},
                 message=f"User with ID:{user_id} deleted",
             )
 
