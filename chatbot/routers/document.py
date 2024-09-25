@@ -11,7 +11,10 @@ from fastapi import (
     UploadFile,
     BackgroundTasks,
     Form,
+    Response,
 )
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from chatbot.database import SessionLocal
@@ -21,7 +24,7 @@ from chatbot.dependencies.IntentClassifier import Intent
 from chatbot.dependencies.utils.auth import protected_route, ACL
 from chatbot.dependencies.utils.path_utils import project_path
 from chatbot.http.Response import Response as ResponseTemplate
-from ..logger import logger
+from chatbot.logger import logger
 
 router = APIRouter(prefix="/document", tags=["Document"])
 
@@ -225,3 +228,37 @@ async def delete_document(
     return ResponseTemplate(
         message="Document deleted successfully", data={"document_id": document_uuid}
     )
+
+
+@router.get("/{document_uuid}", status_code=status.HTTP_200_OK)
+async def get_document(document_uuid: str):
+    """
+    Retrieves a document from the database.
+
+    Args:
+        document_id (int): The ID of the document to be retrieved.
+
+    Returns:
+        dict: A message indicating successful document retrieval and the retrieved document details.
+    """
+    with SessionLocal() as db:
+        document = db.query(Document).filter(Document.uuid == document_uuid).first()
+
+    if document:
+        document_path = document.file_path
+
+        if ".pdf" not in document_path:
+            return FileResponse(
+                document_path,
+                filename=document.name,
+                headers={"Content-Disposition": "inline"},
+            )
+
+        return FileResponse(
+            document_path,
+            media_type="application/pdf",
+            filename=document.name,
+            headers={"Content-Disposition": "inline"},
+        )
+
+    raise HTTPException(status_code=404, detail="Document not found")

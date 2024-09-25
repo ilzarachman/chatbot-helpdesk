@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 
 import os
+
 from chatbot.logger import configure_logging, logger
 from fastapi import FastAPI
 
