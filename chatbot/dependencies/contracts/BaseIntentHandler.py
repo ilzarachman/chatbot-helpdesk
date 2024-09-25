@@ -113,7 +113,9 @@ class BaseIntentHandler(ABC):
             return self._prompt_template.render()
         return self._prompt_template.render(information=information)
 
-    def build_public_prompt_with_information(self, information: str | None = None) -> str:
+    def build_public_prompt_with_information(
+        self, information: str | None = None
+    ) -> str:
         """
         Builds the prompt with information.
 
@@ -141,7 +143,9 @@ class BaseIntentHandler(ABC):
             context = {}
         return self._prompt_template.render(**context)
 
-    async def handle(self, message: str, history: list[dict] | None = None) -> AsyncIterator[str]:
+    async def handle(
+        self, message: str, history: list[dict] | None = None
+    ) -> AsyncIterator[str]:
         """
         Handles the intent of the message.
 
@@ -159,7 +163,11 @@ class BaseIntentHandler(ABC):
 
         logger.debug(f"Handling intent: {self._intent}")
 
-        message_with_history = "\n".join([f"{message['U']}\n{message['A']}" for message in history]) + "\n" + message
+        message_with_history = (
+            "\n".join([f"{message['U']}\n{message['A']}" for message in history])
+            + "\n"
+            + message
+        )
 
         logger.debug(f"Message with history: {message_with_history}")
 
@@ -172,7 +180,9 @@ class BaseIntentHandler(ABC):
 
         return response
 
-    async def handle_public(self, message: str) -> AsyncIterator[str]:
+    async def handle_public(
+        self, message: str, history: list[dict] | None = None
+    ) -> AsyncIterator[str]:
         """
         Handles the intent of the message.
 
@@ -184,16 +194,41 @@ class BaseIntentHandler(ABC):
         Returns:
             str: The response to the message.
         """
+        # if self._intent is None:
+        #     raise NotImplementedError("intent is not set")
+
+        # logger.debug(f"Handling public intent: {self._intent}")
+
+        # information = await self.information_retriever.retrieve_public_async(
+        #     message, self._intent
+        # )
+        # prompt_template = self.build_public_prompt_with_information(information)
+        # response_generator = ResponseGenerator.with_prompt_template(prompt_template)
+        # response = response_generator.response_async(message, [])
+
+        # return response
         if self._intent is None:
             raise NotImplementedError("intent is not set")
 
         logger.debug(f"Handling public intent: {self._intent}")
 
-        information = await self.information_retriever.retrieve_public_async(
-            message, self._intent
+        message_with_history = (
+            (
+                "\n".join([f"{message['U']}\n{message['A']}" for message in history])
+                + "\n"
+                + message
+            )
+            if history
+            else message
         )
-        prompt_template = self.build_public_prompt_with_information(information)
+
+        logger.debug(f"Message with history: {message_with_history}")
+
+        information = await self.information_retriever.retrieve_public_async(
+            message_with_history, self._intent
+        )
+        prompt_template = self.build_prompt_with_information(information)
         response_generator = ResponseGenerator.with_prompt_template(prompt_template)
-        response = response_generator.response_async(message, [])
+        response = response_generator.response_async(message, history)
 
         return response

@@ -32,6 +32,13 @@ class ChatMessage(BaseModel):
     message: str = "This is a test message"
     conversation_uuid: str = ""
 
+class ChatMessageWithHistory(ChatMessage):
+    """
+    ChatMessageWithHistory model.
+    """
+
+    history: str = ""
+
 
 async def handle_chat_for_authenticated_user(
         chat_message: ChatMessage,
@@ -93,7 +100,7 @@ async def handle_chat_for_authenticated_user(
 
 
 async def handle_chat_for_non_user(
-        chat_message: ChatMessage,
+        chat_message: ChatMessageWithHistory,
         app: Application,
 ) -> AsyncIterator[str]:
     """
@@ -106,20 +113,24 @@ async def handle_chat_for_non_user(
     Returns:
         dict: The response message.
     """
+    history: list[dict] = json.loads(chat_message.history)
+
+    logger.info(f"get history: {history}")
+
     message: str = chat_message.message
-    intent: Intent = await app.intent_classifier.classify(message)
+    intent: Intent = await app.intent_classifier.classify_with_history(message, history)
 
     logger.info(f"get non user intent: {intent.value}")
 
     handler = IntentHandlerFactory.get_handler(intent)
-    response = await handler.with_app(app).handle_public(message)
+    response = await handler.with_app(app).handle_public(message, history=history)
 
     return response
 
 
 @router.post("/prompt")
 async def chat_prompt(
-        chat_message: ChatMessage,
+        chat_message: ChatMessageWithHistory,
         app: Application = Depends(get_application),
         user: Student | Staff | None = Depends(protected_route(ACL.ALL)),
 ):

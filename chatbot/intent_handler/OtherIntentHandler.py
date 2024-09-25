@@ -38,7 +38,7 @@ class OtherIntentHandler(BaseIntentHandler):
 
         return response
 
-    async def handle_public(self, message: str) -> AsyncIterator[str]:
+    async def handle_public(self, message: str, history: list[dict] | None = None) -> AsyncIterator[str]:
         """
         Handles the intent of the message.
 
@@ -53,6 +53,6 @@ class OtherIntentHandler(BaseIntentHandler):
         prompt_template = self.build_prompt()
         response_generator = ResponseGenerator.with_prompt_template(prompt_template)
 
-        response = response_generator.response_async(message, [])
+        response = response_generator.response_async(message, history)
 
         return response
