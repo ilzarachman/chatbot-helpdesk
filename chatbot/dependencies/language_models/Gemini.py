@@ -190,10 +190,8 @@ class Gemini(TextGenerator):
         res = self._generate(prompt, config, stream=True)
         try:
             for chunk in res:
-                if ("</MSG>" in chunk.text) or ("<MSG>" in chunk.text):
-                    yield str(Gemini.GeminiResponse(chunk.text))
-                    continue
-                yield chunk.text
+                yield str(Gemini.GeminiResponse(chunk.text))
+
         except ValueError as e:
             logger.warning(e)
             yield self._handle_value_error(e, res)
@@ -245,10 +243,8 @@ class Gemini(TextGenerator):
         res = await self._generate_async(prompt, config, stream=True)
         try:
             async for chunk in res:
-                if "</MSG>" in chunk.text:
-                    yield str(Gemini.GeminiResponse(chunk.text))
-                    continue
-                yield chunk.text
+                yield str(Gemini.GeminiResponse(chunk.text))
+
         except ValueError as e:
             logger.warning(e)
             yield self._handle_value_error(e, res)
