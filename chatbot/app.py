@@ -21,7 +21,7 @@ def set_application(application: Application):
     app = application
 
 
-def get_application() -> Application:
+def get_application() -> Application | None:
     """
     Returns the application instance.
 
