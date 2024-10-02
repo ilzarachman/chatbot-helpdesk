@@ -56,7 +56,7 @@ class Gemini(TextGenerator):
 
     class GeminiResponse:
         def __init__(self, response: str):
-            self.response = re.sub(r"<\/?MSG>", "", response, flags=re.DOTALL)
+            self.response = re.sub(r"<\/?MSG>", "", response, flags=re.MULTILINE)
 
         def __str__(self):
             return self.response
